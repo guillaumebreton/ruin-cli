@@ -86,10 +86,26 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/mattn/go-runewidth",
+			"repository": "https://github.com/mattn/go-runewidth",
+			"vcs": "git",
+			"revision": "14207d285c6c197daabb5c9793d63e7af9ab2d50",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/mitchellh/mapstructure",
 			"repository": "https://github.com/mitchellh/mapstructure",
 			"vcs": "git",
 			"revision": "53818660ed4955e899c0bcafa97299a388bd7c8e",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/olekukonko/tablewriter",
+			"repository": "https://github.com/olekukonko/tablewriter",
+			"vcs": "git",
+			"revision": "febf2d34b54a69ce7530036c7503b1c9fbfdf0bb",
 			"branch": "master",
 			"notests": true
 		},
