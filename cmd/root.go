@@ -71,9 +71,7 @@ func initConfig() {
 	}
 	//TODO add default values for the configuration
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Printf("Errrrorrr : %+v\n", err)
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Cannot load config file : %+v\n", err)
 	}
 }

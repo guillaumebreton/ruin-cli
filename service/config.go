@@ -1,30 +1,42 @@
 package service
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
+	"encoding/json"
+	"io/ioutil"
 )
 
+type Budgets map[string]float64
+
 type Config struct {
-	Budgets []Budget
+	Budgets map[string]float64 `json:"budgets"`
 }
 
-type Budget struct {
-	Category string  `json:"category"`
-	Value    float64 `json:"value"`
-}
-
-func GetBudgets() []Budget {
-	v := viper.GetStringMap("budgets")
-	b := make([]Budget, len(v))
-	i := 0
-	for k, v := range v {
-		f, _ := v.(float64)
-		b[i] = Budget{
-			Category: k,
-			Value:    f,
-		}
-		i++
+func LoadConfig() (*Config, error) {
+	filepath := "/Users/guillaume/.config/gobud.json"
+	file, e := ioutil.ReadFile(filepath)
+	if e != nil {
+		return nil, e
 	}
-	return b
+	var config Config
+	json.Unmarshal(file, &config)
+	return &config, nil
+}
+
+func (c *Config) Save() error {
+	filepath := "/Users/guillaume/.config/gobud.json"
+	j, _ := json.Marshal(c)
+	return ioutil.WriteFile(filepath, j, 644)
+}
+
+func (c *Config) GetBudgets() Budgets {
+	return c.Budgets
+}
+
+func (c *Config) SetBudget(category string, value float64) error {
+	_, ok := c.Budgets[category]
+	if !ok {
+		c.Budgets[category] = value
+
+	}
+	return nil
 }
