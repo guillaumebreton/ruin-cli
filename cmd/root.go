@@ -59,8 +59,6 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 // TODO extract in a service
 func initConfig() {
-	println(cfgFile)
-
 	viper.SetConfigName("gobud")         // name of config file (without extension)
 	viper.AddConfigPath(".")             // adding home directory as first search path
 	viper.AddConfigPath("$HOME/.config") // adding home directory as first search path
