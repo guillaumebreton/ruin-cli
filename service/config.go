@@ -28,6 +28,11 @@ func (c *Config) Save() error {
 	return ioutil.WriteFile(filepath, j, 644)
 }
 
+func (c *Config) Delete(category string) error {
+	delete(c.Budgets, category)
+	return nil
+}
+
 func (c *Config) GetBudgets() Budgets {
 	return c.Budgets
 }
