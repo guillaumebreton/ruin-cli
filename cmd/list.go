@@ -21,7 +21,7 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(listCmd)
+	budgetCmd.AddCommand(listCmd)
 
 	listCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
 

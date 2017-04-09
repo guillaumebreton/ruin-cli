@@ -43,5 +43,5 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	RootCmd.AddCommand(deleteCmd)
+	budgetCmd.AddCommand(deleteCmd)
 }
