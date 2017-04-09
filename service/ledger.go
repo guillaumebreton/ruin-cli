@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"sort"
@@ -46,7 +47,8 @@ func (l *Ledger) Save() error {
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
 	for k, v := range t {
-		v.Number = k
+		v.Number = k + 1
+		t[k] = v
 	}
 	j, _ := json.Marshal(l)
 	return ioutil.WriteFile(filepath, j, 770)
@@ -80,6 +82,18 @@ func (l *Ledger) Get(ID string) *Transaction {
 	}
 	return nil
 
+}
+
+func (l *Ledger) SetCategory(id int, category string) error {
+
+	for k, t := range l.Transactions {
+		if t.Number == id {
+			t.Category = category
+			l.Transactions[k] = t
+			return nil
+		}
+	}
+	return fmt.Errorf("Transaction not found")
 }
 
 type Filter struct {

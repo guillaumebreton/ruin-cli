@@ -68,8 +68,8 @@ to quickly create a Cobra application.`,
 func RenderTransactionListText(transactions []service.Transaction) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"#", "Date", "Description", "Category", "Amount"})
-	for k, v := range transactions {
-		table.Append([]string{fmt.Sprintf("%d", k+1), v.Date.Format("2006-01-02"), v.Description, v.Category, fmt.Sprintf("%.2f", v.Amount)})
+	for _, v := range transactions {
+		table.Append([]string{fmt.Sprintf("%d", v.Number), v.Date.Format("2006-01-02"), v.Description, v.Category, fmt.Sprintf("%.2f", v.Amount)})
 	}
 	table.SetAutoMergeCells(true)
 	table.SetAutoWrapText(false)
