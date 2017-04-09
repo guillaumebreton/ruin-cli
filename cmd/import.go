@@ -35,7 +35,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
-		file, err := os.Open("data.ofx")
+		file, err := os.Open(args[0])
 		doc, err := ofx.Parse(file)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
@@ -49,7 +49,7 @@ to quickly create a Cobra application.`,
 		// TODO print the number of added task
 		for _, tx := range doc.Transactions {
 			a, _ := tx.Amount.Value.Float64()
-			l.Add(tx.ID, tx.UserDate, tx.Type.String(), tx.Description, a)
+			l.Add(tx.ID, tx.PostedDate, tx.Type.String(), tx.Description, a)
 		}
 		l.Save()
 	},

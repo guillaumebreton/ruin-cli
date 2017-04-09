@@ -4,24 +4,32 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"sort"
 	"time"
 )
 
+type Transactions []Transaction
+
+func (a Transactions) Len() int           { return len(a) }
+func (a Transactions) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Transactions) Less(i, j int) bool { return a[i].Date.After(a[j].Date) }
+
 type Ledger struct {
-	Transactions []Transaction
+	Transactions Transactions `json:"transactions"`
 }
+
 type Transaction struct {
 	ID          string    `json:"id"`
 	Amount      float64   `json:"amount"`
-	Description string    `json:description`
+	Description string    `json:"description"`
 	Date        time.Time `json:"date"`
-	Type        string    `json:type`
-	Category    string    `json:category`
+	Type        string    `json:"type"`
+	Category    string    `json:"category"`
 }
 
 func LoadLedger() (*Ledger, error) {
 	filepath := "/Users/guillaume/.config/ledger.json"
-	if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		return &Ledger{make([]Transaction, 0)}, nil
 	}
 	file, e := ioutil.ReadFile(filepath)
@@ -66,4 +74,39 @@ func (l *Ledger) Get(ID string) *Transaction {
 	}
 	return nil
 
+}
+
+type Filter struct {
+	StartDate time.Time
+	EndDate   time.Time
+}
+
+func NewFilter() *Filter {
+	return &Filter{}
+}
+
+func (f *Filter) IsFiltered(transaction Transaction) bool {
+	if f.StartDate.After(time.Time{}) {
+		if transaction.Date.Before(f.StartDate) {
+			return true
+		}
+	}
+	if f.EndDate.After(time.Time{}) {
+		if transaction.Date.After(f.EndDate) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *Ledger) GetTransactions(f *Filter) Transactions {
+	t := Transactions(l.Transactions)
+	sort.Sort(t)
+	result := []Transaction{}
+	for _, tx := range t {
+		if !f.IsFiltered(tx) {
+			result = append(result, tx)
+		}
+	}
+	return result
 }
