@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/anupcshan/ofx",
+			"repository": "https://github.com/anupcshan/ofx",
+			"vcs": "git",
+			"revision": "371e9fea5946e04882593589026e479034de23ae",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/armon/consul-api",
 			"repository": "https://github.com/armon/consul-api",
 			"vcs": "git",

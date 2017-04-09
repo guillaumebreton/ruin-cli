@@ -1,0 +1,71 @@
+// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/anupcshan/ofx"
+	"github.com/guillaumebreton/gobud/service"
+	"github.com/spf13/cobra"
+	"os"
+)
+
+// importCmd represents the import command
+var importCmd = &cobra.Command{
+	Use:   "import",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// TODO: Work your own magic here
+		file, err := os.Open("data.ofx")
+		doc, err := ofx.Parse(file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
+		// TODO print the number of added task
+		for _, tx := range doc.Transactions {
+			a, _ := tx.Amount.Value.Float64()
+			l.Add(tx.ID, tx.UserDate, tx.Type.String(), tx.Description, a)
+		}
+		l.Save()
+	},
+}
+
+func init() {
+	RootCmd.AddCommand(statusCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// statusCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// statusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+}
