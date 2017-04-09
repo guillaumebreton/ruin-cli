@@ -19,6 +19,7 @@ type Ledger struct {
 }
 
 type Transaction struct {
+	Number      int       `json:"number"`
 	ID          string    `json:"id"`
 	Amount      float64   `json:"amount"`
 	Description string    `json:"description"`
@@ -42,6 +43,11 @@ func LoadLedger() (*Ledger, error) {
 }
 func (l *Ledger) Save() error {
 	filepath := "/Users/guillaume/.config/ledger.json"
+	t := Transactions(l.Transactions)
+	sort.Sort(t)
+	for k, v := range t {
+		v.Number = k
+	}
 	j, _ := json.Marshal(l)
 	return ioutil.WriteFile(filepath, j, 770)
 }
