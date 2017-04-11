@@ -19,7 +19,9 @@ import (
 	"github.com/guillaumebreton/gobud/service"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
+	"math"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -94,17 +96,25 @@ to quickly create a Cobra application.`,
 func RenderReport(report map[string]ReportBudget) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Category", "Spent", "Reserved", "Left"})
-	for _, v := range report {
+
+	// the keys
+	keys := make([]string, 0, len(report))
+	for k, _ := range report {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		v := report[k]
 		var sum float64 = 0
 		for _, v := range v.Transactions {
 			sum += v.Amount
 		}
-		table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", v.Value), fmt.Sprintf("%0.2f", v.Value-sum)})
+		table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", v.Value), fmt.Sprintf("%0.2f", v.Value-math.Abs(sum))})
 	}
-	table.SetAutoMergeCells(true)
-	table.SetAutoWrapText(false)
-	table.Render() // Send output
 
+	table.SetAutoWrapText(false)
+	table.Render()
 }
 
 func init() {
