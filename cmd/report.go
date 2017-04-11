@@ -69,7 +69,6 @@ to quickly create a Cobra application.`,
 			f.StartDate = t
 		}
 		txs := l.GetTransactions(f)
-		println(len(txs))
 
 		// Get budgets
 		c, _ := service.LoadConfig()

@@ -131,6 +131,5 @@ func (l *Ledger) GetTransactions(f *Filter) Transactions {
 			result = append(result, tx)
 		}
 	}
-	println(len(t), len(result))
 	return result
 }
