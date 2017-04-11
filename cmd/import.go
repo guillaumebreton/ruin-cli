@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 
 		// Clean the files
 		str := strings.Replace(string(bs), ",", ".", -1)
-		re := regexp.MustCompile("\\d\\s\\d")
+		re := regexp.MustCompile("(\\d)\\s(\\d)")
 		str = re.ReplaceAllString(str, "${1}${2}")
 
 		doc, err := ofx.Parse(strings.NewReader(str))
@@ -60,10 +60,14 @@ to quickly create a Cobra application.`,
 			os.Exit(1)
 		}
 		// TODO print the number of added task
+		count := 0
 		for _, tx := range doc.Transactions {
 			a, _ := tx.Amount.Value.Float64()
-			l.Add(tx.ID, tx.PostedDate, tx.Type.String(), tx.Description, a)
+			if l.Add(tx.ID, tx.PostedDate, tx.Type.String(), tx.Description, a) {
+				count++
+			}
 		}
+		fmt.Printf("%d transactions added\n", count)
 		l.Save()
 	},
 }

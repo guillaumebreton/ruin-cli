@@ -71,7 +71,7 @@ func RenderTransactionListText(transactions []service.Transaction) {
 	for _, v := range transactions {
 		table.Append([]string{fmt.Sprintf("%d", v.Number), v.Date.Format("2006-01-02"), v.Description, v.Category, fmt.Sprintf("%.2f", v.Amount)})
 	}
-	table.SetAutoMergeCells(true)
+	// table.SetAutoMergeCells(true)
 	table.SetAutoWrapText(false)
 	table.Render() // Send output
 }

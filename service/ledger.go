@@ -53,7 +53,7 @@ func (l *Ledger) Save() error {
 	j, _ := json.Marshal(l)
 	return ioutil.WriteFile(filepath, j, 770)
 }
-func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) {
+func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
 	t := l.Get(ID)
 	if t == nil {
 		transaction := Transaction{
@@ -65,12 +65,14 @@ func (l *Ledger) Add(ID string, date time.Time, txtype string, description strin
 			Category:    "",
 		}
 		l.Transactions = append(l.Transactions, transaction)
+		return true
 	} else {
 		t.ID = ID
 		t.Date = date
 		t.Type = txtype
 		t.Description = description
 		t.Amount = amount
+		return false
 	}
 }
 
