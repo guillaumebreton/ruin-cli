@@ -20,7 +20,10 @@ import (
 	"github.com/anupcshan/ofx"
 	"github.com/guillaumebreton/gobud/service"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 	"os"
+	"regexp"
+	"strings"
 )
 
 // importCmd represents the import command
@@ -34,9 +37,19 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		file, err := os.Open(args[0])
-		doc, err := ofx.Parse(file)
+
+		bs, err := ioutil.ReadFile(args[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Clean the files
+		str := strings.Replace(string(bs), ",", ".", -1)
+		re := regexp.MustCompile("\\d\\s\\d")
+		str = re.ReplaceAllString(str, "${1}${2}")
+
+		doc, err := ofx.Parse(strings.NewReader(str))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
 			os.Exit(1)
@@ -57,15 +70,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	txCmd.AddCommand(importCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// statusCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// statusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }
