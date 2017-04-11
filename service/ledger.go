@@ -86,12 +86,13 @@ func (l *Ledger) Get(ID string) *Transaction {
 
 }
 
-func (l *Ledger) SetCategory(id int, category string) error {
+func (l *Ledger) SetCategory(number int, category string) error {
 
 	for k, t := range l.Transactions {
-		if t.Number == id {
+		if t.Number == number {
 			t.Category = category
 			l.Transactions[k] = t
+			println(l.Transactions[k].Category)
 			return nil
 		}
 	}

@@ -38,10 +38,6 @@ func (c *Config) GetBudgets() Budgets {
 }
 
 func (c *Config) SetBudget(category string, value float64) error {
-	_, ok := c.Budgets[category]
-	if !ok {
-		c.Budgets[category] = value
-
-	}
+	c.Budgets[category] = value
 	return nil
 }

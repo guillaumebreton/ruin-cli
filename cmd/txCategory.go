@@ -21,6 +21,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 // txCategoryCmd represents the txCategory command
@@ -39,11 +40,12 @@ to quickly create a Cobra application.`,
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
 			os.Exit(1)
 		}
-
-		//TODO Check the number of args
-		id, _ := strconv.Atoi(args[0])
+		ids_str := strings.Split(args[0], ",")
 		category := args[1]
-		l.SetCategory(id, category)
+		for _, id_str := range ids_str {
+			id, _ := strconv.Atoi(id_str)
+			l.SetCategory(id, category)
+		}
 		l.Save()
 	},
 }
