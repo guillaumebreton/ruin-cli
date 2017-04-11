@@ -25,4 +25,11 @@ gobud budget delete
 
 gobug tx import
 gobud tx category 1 alimentation
-gobud tx list --start=test --end=end
+gobud tx list --start=test --end= 1 1end
+
+gobud set-category 1,2,3
+gobud set-budget
+gobud list-budgets
+gobud tx
+gobud import
+gobud 

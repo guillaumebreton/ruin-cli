@@ -29,7 +29,7 @@ import (
 // importCmd represents the import command
 var importCmd = &cobra.Command{
 	Use:   "import",
-	Short: "A brief description of your command",
+	Short: "import an ofx file into the ledger",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -73,5 +73,5 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	txCmd.AddCommand(importCmd)
+	RootCmd.AddCommand(importCmd)
 }

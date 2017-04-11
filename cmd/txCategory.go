@@ -26,8 +26,8 @@ import (
 
 // txCategoryCmd represents the txCategory command
 var txCategoryCmd = &cobra.Command{
-	Use:   "category",
-	Short: "A brief description of your command",
+	Use:   "set",
+	Short: "Set the category of a transaction",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -51,7 +51,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	txCmd.AddCommand(txCategoryCmd)
+	RootCmd.AddCommand(txCategoryCmd)
 
 	// Here you will define your flags and configuration settings.
 
