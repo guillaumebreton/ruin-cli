@@ -22,9 +22,9 @@ import (
 )
 
 // deleteCmd represents the delete command
-var deleteCmd = &cobra.Command{
+var deleteBudgetCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete a category",
+	Short: "Delete a budget on a category",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -43,5 +43,5 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	budgetCmd.AddCommand(deleteCmd)
+	budgetCmd.AddCommand(deleteBudgetCmd)
 }

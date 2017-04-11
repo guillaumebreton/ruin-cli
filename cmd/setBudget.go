@@ -22,8 +22,8 @@ import (
 	"strconv"
 )
 
-// setCmd represents the set command
-var setCmd = &cobra.Command{
+// setBudgetCmd represents the set command
+var setBudgetCmd = &cobra.Command{
 	Use:   "set",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -48,5 +48,5 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	budgetCmd.AddCommand(setCmd)
+	budgetCmd.AddCommand(setBudgetCmd)
 }

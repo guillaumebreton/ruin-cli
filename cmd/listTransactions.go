@@ -28,7 +28,7 @@ var endDate string
 var startDate string
 
 // listTransactionCmd represents the listTransaction command
-var listTransactionCmd = &cobra.Command{
+var listTransactionsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -76,9 +76,9 @@ func RenderTransactionListText(transactions []service.Transaction) {
 	table.Render() // Send output
 }
 func init() {
-	txCmd.AddCommand(listTransactionCmd)
+	txCmd.AddCommand(listTransactionsCmd)
 
-	listTransactionCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "the start date")
-	listTransactionCmd.Flags().StringVarP(&endDate, "end-date", "e", "", "the end date")
+	listTransactionsCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "the start date")
+	listTransactionsCmd.Flags().StringVarP(&endDate, "end-date", "e", "", "the end date")
 
 }

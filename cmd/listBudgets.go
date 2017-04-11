@@ -9,24 +9,24 @@ import (
 )
 
 // listCmd represents the list command
-var listCmd = &cobra.Command{
+var listBudgetsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all the budgets",
 	Long:  `Define`,
 	Run: func(cmd *cobra.Command, args []string) {
 		c, _ := service.LoadConfig()
 		budgets := c.GetBudgets()
-		RenderListText(budgets)
+		RenderBudgetsListText(budgets)
 	},
 }
 
 func init() {
-	budgetCmd.AddCommand(listCmd)
-	listCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
+	budgetCmd.AddCommand(listBudgetsCmd)
+	listBudgetsCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
 
 }
 
-func RenderListText(budgets service.Budgets) {
+func RenderBudgetsListText(budgets service.Budgets) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Category", "Value"})
 	table.SetBorder(false)
