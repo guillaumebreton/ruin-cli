@@ -69,24 +69,43 @@ to quickly create a Cobra application.`,
 			f.StartDate = t
 		}
 		txs := l.GetTransactions(f)
+		println(len(txs))
 
 		// Get budgets
 		c, _ := service.LoadConfig()
 		budgets := c.GetBudgets()
 
 		report := map[string]ReportBudget{}
-		for c, v := range budgets {
-			rb := ReportBudget{
-				Category:     c,
-				Value:        v,
-				Transactions: []service.Transaction{},
-			}
-			for _, tx := range txs {
-				if tx.Category == c {
-					rb.Transactions = append(rb.Transactions, tx)
+
+		for _, t := range txs {
+			rb, ok := report[t.Category]
+			if ok {
+				rb.Transactions = append(rb.Transactions, t)
+				report[t.Category] = rb
+			} else {
+				rb = ReportBudget{
+					Category:     t.Category,
+					Value:        0,
+					Transactions: []service.Transaction{t},
 				}
+				report[t.Category] = rb
 			}
-			report[c] = rb
+		}
+
+		for c, v := range budgets {
+			rb, ok := report[c]
+			if ok {
+				rb.Value = v
+				report[c] = rb
+			} else {
+				rb := ReportBudget{
+					Category:     c,
+					Value:        v,
+					Transactions: []service.Transaction{},
+				}
+				report[c] = rb
+			}
+
 		}
 
 		RenderReport(report)
@@ -95,7 +114,7 @@ to quickly create a Cobra application.`,
 
 func RenderReport(report map[string]ReportBudget) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Category", "Spent", "Reserved", "Left"})
+	table.SetHeader([]string{"Category", "Current", "Future", "Left"})
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -103,23 +122,37 @@ func RenderReport(report map[string]ReportBudget) {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-
+	var spentTotal, reservedTotal, leftTotal float64
 	for _, k := range keys {
 		v := report[k]
 		var sum float64 = 0
 		for _, v := range v.Transactions {
 			sum += v.Amount
 		}
-		table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", v.Value), fmt.Sprintf("%0.2f", v.Value-math.Abs(sum))})
+
+		if v.Value != 0 {
+
+			spentTotal += sum
+			reservedTotal += -1 * v.Value
+			leftTotal += v.Value - math.Abs(sum)
+			table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", -1*v.Value), fmt.Sprintf("%0.2f", v.Value-math.Abs(sum))})
+		} else {
+
+			spentTotal += sum
+			reservedTotal += sum
+			leftTotal += 0
+			table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", float64(0))})
+		}
 	}
 
+	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", spentTotal), fmt.Sprintf("%0.2f", reservedTotal), fmt.Sprintf("%0.2f", leftTotal)})
 	table.SetAutoWrapText(false)
 	table.Render()
 }
 
 func init() {
 	RootCmd.AddCommand(reportCmd)
-	reportCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "the start date")
-	reportCmd.Flags().StringVarP(&endDate, "end-date", "e", "", "the end date")
+	reportCmd.Flags().StringVarP(&reportStartDate, "start-date", "s", "", "the start date")
+	reportCmd.Flags().StringVarP(&reportEndDate, "end-date", "e", "", "the end date")
 
 }

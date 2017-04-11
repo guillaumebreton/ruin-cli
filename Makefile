@@ -4,5 +4,5 @@ build:
 fmt:
 	go fmt . && go vet .
 
-install:
+install: build
 	go install

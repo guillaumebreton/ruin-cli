@@ -92,11 +92,10 @@ func (l *Ledger) SetCategory(number int, category string) error {
 		if t.Number == number {
 			t.Category = category
 			l.Transactions[k] = t
-			println(l.Transactions[k].Category)
 			return nil
 		}
 	}
-	return fmt.Errorf("Transaction not found")
+	return fmt.Errorf("Transaction %d not found", number)
 }
 
 type Filter struct {
@@ -109,6 +108,7 @@ func NewFilter() *Filter {
 }
 
 func (f *Filter) IsFiltered(transaction Transaction) bool {
+	// fmt.Printf("%v %v\n", transaction.Date, f.StartDate)
 	if f.StartDate.After(time.Time{}) {
 		if transaction.Date.Before(f.StartDate) {
 			return true
@@ -131,5 +131,6 @@ func (l *Ledger) GetTransactions(f *Filter) Transactions {
 			result = append(result, tx)
 		}
 	}
+	println(len(t), len(result))
 	return result
 }
