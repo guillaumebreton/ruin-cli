@@ -133,3 +133,12 @@ func (l *Ledger) GetTransactions(f *Filter) Transactions {
 	}
 	return result
 }
+
+func (l *Ledger) RenameCategory(oldName, newName string) {
+	for k, tx := range l.Transactions {
+		if tx.Category == oldName {
+			tx.Category = newName
+			l.Transactions[k] = tx
+		}
+	}
+}
