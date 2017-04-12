@@ -71,8 +71,7 @@ to quickly create a Cobra application.`,
 		txs := l.GetTransactions(f)
 
 		// Get budgets
-		c, _ := service.LoadConfig()
-		budgets := c.GetBudgets()
+		budgets := l.GetBudgets()
 
 		report := map[string]ReportBudget{}
 

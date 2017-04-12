@@ -19,6 +19,7 @@ import (
 
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
+	"os"
 	"strconv"
 )
 
@@ -40,10 +41,14 @@ to quickly create a Cobra application.`,
 		}
 		key := args[0]
 		value := args[1]
-		c, _ := service.LoadConfig()
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
 		v, _ := strconv.ParseFloat(value, 64)
-		c.SetBudget(key, v)
-		c.Save()
+		l.SetBudget(key, v)
+		l.Save()
 	},
 }
 

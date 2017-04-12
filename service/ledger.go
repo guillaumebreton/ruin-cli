@@ -10,13 +10,16 @@ import (
 )
 
 type Transactions []Transaction
+type Budgets map[string]float64
 
 func (a Transactions) Len() int           { return len(a) }
 func (a Transactions) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Transactions) Less(i, j int) bool { return a[i].Date.After(a[j].Date) }
 
 type Ledger struct {
-	Transactions Transactions `json:"transactions"`
+	version      int                `json:"version"`
+	Budgets      map[string]float64 `json:"budgets"`
+	Transactions Transactions       `json:"transactions"`
 }
 
 type Transaction struct {
@@ -32,7 +35,7 @@ type Transaction struct {
 func LoadLedger() (*Ledger, error) {
 	filepath := "/Users/guillaume/.config/ledger.json"
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return &Ledger{make([]Transaction, 0)}, nil
+		return &Ledger{1, make(map[string]float64, 0), make([]Transaction, 0)}, nil
 	}
 	file, e := ioutil.ReadFile(filepath)
 	if e != nil {
@@ -141,4 +144,18 @@ func (l *Ledger) RenameCategory(oldName, newName string) {
 			l.Transactions[k] = tx
 		}
 	}
+}
+
+func (l *Ledger) DeleteBudget(category string) error {
+	delete(l.Budgets, category)
+	return nil
+}
+
+func (l *Ledger) GetBudgets() Budgets {
+	return l.Budgets
+}
+
+func (l *Ledger) SetBudget(category string, value float64) error {
+	l.Budgets[category] = value
+	return nil
 }

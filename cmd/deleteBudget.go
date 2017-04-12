@@ -19,6 +19,7 @@ import (
 
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // deleteCmd represents the delete command
@@ -36,9 +37,13 @@ to quickly create a Cobra application.`,
 			fmt.Println("Need to provide a category")
 			return
 		}
-		c, _ := service.LoadConfig()
-		c.Delete(args[0])
-		c.Save()
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
+		l.DeleteBudget(args[0])
+		l.Save()
 	},
 }
 

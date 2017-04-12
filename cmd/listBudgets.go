@@ -14,8 +14,12 @@ var listBudgetsCmd = &cobra.Command{
 	Short: "List all the budgets",
 	Long:  `Define`,
 	Run: func(cmd *cobra.Command, args []string) {
-		c, _ := service.LoadConfig()
-		budgets := c.GetBudgets()
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			os.Exit(1)
+		}
+		budgets := l.GetBudgets()
 		RenderBudgetsListText(budgets)
 	},
 }
