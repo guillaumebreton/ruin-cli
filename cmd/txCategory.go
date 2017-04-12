@@ -16,7 +16,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/guillaumebreton/gobud/service"
+	"github.com/guillaumebreton/ruin/service"
 	"os"
 	"strconv"
 

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/guillaumebreton/gobud/service"
+	"github.com/guillaumebreton/ruin/service"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"os"

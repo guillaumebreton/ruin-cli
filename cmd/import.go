@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/anupcshan/ofx"
-	"github.com/guillaumebreton/gobud/service"
+	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"

@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/guillaumebreton/gobud/cmd"
+import "github.com/guillaumebreton/ruin/cmd"
 
 func main() {
 	cmd.Execute()
