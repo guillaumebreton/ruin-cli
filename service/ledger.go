@@ -104,6 +104,7 @@ func (l *Ledger) SetCategory(number int, category string) error {
 type Filter struct {
 	StartDate time.Time
 	EndDate   time.Time
+	Category  string
 }
 
 func NewFilter() *Filter {
@@ -121,6 +122,12 @@ func (f *Filter) IsFiltered(transaction Transaction) bool {
 		if transaction.Date.After(f.EndDate) {
 			return true
 		}
+	}
+	if f.Category != "" {
+		if transaction.Category != f.Category {
+			return true
+		}
+
 	}
 	return false
 }

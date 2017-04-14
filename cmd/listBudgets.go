@@ -10,7 +10,7 @@ import (
 
 // listCmd represents the list command
 var listBudgetsCmd = &cobra.Command{
-	Use:   "list",
+	Use:   "budgets",
 	Short: "List all the budgets",
 	Long:  `Define`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -25,7 +25,7 @@ var listBudgetsCmd = &cobra.Command{
 }
 
 func init() {
-	budgetCmd.AddCommand(listBudgetsCmd)
+	listCmd.AddCommand(listBudgetsCmd)
 	listBudgetsCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
 
 }
@@ -33,14 +33,6 @@ func init() {
 func RenderBudgetsListText(budgets service.Budgets) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Category", "Value"})
-	table.SetBorder(false)
-	table.SetRowLine(false) // Enable row line
-	table.SetHeaderLine(false)
-
-	// Change table lines
-	table.SetCenterSeparator("*")
-	table.SetColumnSeparator("")
-	table.SetRowSeparator("-")
 	for k, v := range budgets {
 		table.Append([]string{k, fmt.Sprintf("%.2f", v)})
 	}

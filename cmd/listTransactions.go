@@ -26,6 +26,7 @@ import (
 
 var endDate string
 var startDate string
+var listCategory string
 
 // listTransactionCmd represents the listTransaction command
 var listTransactionsCmd = &cobra.Command{
@@ -61,6 +62,9 @@ to quickly create a Cobra application.`,
 			f.StartDate = t
 		}
 
+		if listCategory != "" {
+			f.Category = listCategory
+		}
 		RenderTransactionListText(l.GetTransactions(f))
 	},
 }
@@ -75,10 +79,15 @@ func RenderTransactionListText(transactions []service.Transaction) {
 	table.SetAutoWrapText(false)
 	table.Render() // Send output
 }
+
+func RenderTransactionListTemplate(transactions []service.Transaction) {
+	println("Render template")
+}
 func init() {
-	RootCmd.AddCommand(listTransactionsCmd)
+	listCmd.AddCommand(listTransactionsCmd)
 
 	listTransactionsCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "the start date")
 	listTransactionsCmd.Flags().StringVarP(&endDate, "end-date", "e", "", "the end date")
+	listTransactionsCmd.Flags().StringVarP(&listCategory, "category", "c", "", "category")
 
 }
