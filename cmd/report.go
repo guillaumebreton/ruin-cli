@@ -27,6 +27,7 @@ import (
 
 var reportEndDate string
 var reportStartDate string
+var reportWithTransactions bool
 
 type ReportBudget struct {
 	Category     string
@@ -106,7 +107,11 @@ to quickly create a Cobra application.`,
 
 		}
 
-		RenderReport(report)
+		if reportWithTransactions {
+			RenderReportWithTransactions(report)
+		} else {
+			RenderReport(report)
+		}
 	},
 }
 
@@ -148,9 +153,45 @@ func RenderReport(report map[string]ReportBudget) {
 	table.Render()
 }
 
+func RenderReportWithTransactions(report map[string]ReportBudget) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"#", "Category", "Spent"})
+
+	// the keys
+	keys := make([]string, 0, len(report))
+	for k, _ := range report {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	var spentTotal, reservedTotal, leftTotal float64
+	for _, k := range keys {
+		v := report[k]
+		var sum float64 = 0
+		for _, t := range v.Transactions {
+			sum += t.Amount
+		}
+		if sum != 0 {
+
+			spentTotal += sum
+			reservedTotal += -1 * v.Value
+			leftTotal += v.Value - math.Abs(sum)
+			table.Append([]string{"", v.Category, ""})
+			for _, t := range v.Transactions {
+				table.Append([]string{fmt.Sprintf("%d", t.Number), t.Description, fmt.Sprintf("%0.2f", t.Amount)})
+			}
+			table.Append([]string{"", "", fmt.Sprintf("%0.2f", sum)})
+		}
+	}
+
+	// table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", spentTotal), fmt.Sprintf("%0.2f", reservedTotal), fmt.Sprintf("%0.2f", leftTotal)})
+	table.SetAutoWrapText(false)
+	table.Render()
+}
+
 func init() {
 	RootCmd.AddCommand(reportCmd)
 	reportCmd.Flags().StringVarP(&reportStartDate, "start-date", "s", "", "the start date")
 	reportCmd.Flags().StringVarP(&reportEndDate, "end-date", "e", "", "the end date")
+	reportCmd.Flags().BoolVarP(&reportWithTransactions, "with-transactions", "t", false, "report budget with associated transactions")
 
 }
