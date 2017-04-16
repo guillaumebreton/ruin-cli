@@ -152,6 +152,8 @@ func (l *Ledger) RenameCategory(oldName, newName string) {
 			l.Transactions[k] = tx
 		}
 	}
+	l.Budgets[newName] = l.Budgets[oldName]
+	delete(l.Budgets, oldName)
 }
 
 func (l *Ledger) DeleteBudget(category string) error {
