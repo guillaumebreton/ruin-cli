@@ -1,17 +1,3 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
@@ -110,14 +96,14 @@ to quickly create a Cobra application.`,
 		if reportWithTransactions {
 			RenderReportWithTransactions(report)
 		} else {
-			RenderReport(report)
+			RenderReport(l.Balance, report)
 		}
 	},
 }
 
-func RenderReport(report map[string]ReportBudget) {
+func RenderReport(balance float64, report map[string]ReportBudget) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Category", "Current", "Future", "Left"})
+	table.SetHeader([]string{"Category", "Current", "Future", "Status"})
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -125,32 +111,40 @@ func RenderReport(report map[string]ReportBudget) {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-	var spentTotal, reservedTotal, leftTotal float64
+
+	var eom float64
 	for _, k := range keys {
 		v := report[k]
 		var sum float64 = 0
 		for _, v := range v.Transactions {
 			sum += v.Amount
 		}
-
-		if v.Value != 0 {
-
-			spentTotal += sum
-			reservedTotal += -1 * v.Value
-			leftTotal += v.Value - math.Abs(sum)
-			table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", -1*v.Value), fmt.Sprintf("%0.2f", v.Value-math.Abs(sum))})
+		var current, future, left float64
+		if v.Value != 0 && (-1*v.Value) < sum {
+			current = sum
+			future = -1 * v.Value
+			left = math.Abs(v.Value) - math.Abs(current)
+		} else if v.Value != 0 && (-1*v.Value) > sum {
+			current = sum
+			future = sum
+			left = math.Abs(v.Value) - math.Abs(current)
 		} else {
-
-			spentTotal += sum
-			reservedTotal += sum
-			leftTotal += 0
-			table.Append([]string{v.Category, fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", sum), fmt.Sprintf("%0.2f", float64(0))})
+			current = sum
+			future = sum
+			left = 0
+		}
+		table.Append([]string{v.Category, format(current), format(future), format(left)})
+		if left > 0 {
+			eom += left
 		}
 	}
-
-	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", spentTotal), fmt.Sprintf("%0.2f", reservedTotal), fmt.Sprintf("%0.2f", leftTotal)})
+	table.Append([]string{"Balance", format(balance), format(balance - eom), ""})
 	table.SetAutoWrapText(false)
 	table.Render()
+}
+
+func format(v float64) string {
+	return fmt.Sprintf("%0.2f", v)
 }
 
 func RenderReportWithTransactions(report map[string]ReportBudget) {

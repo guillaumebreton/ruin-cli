@@ -18,6 +18,7 @@ func (a Transactions) Less(i, j int) bool { return a[i].Date.After(a[j].Date) }
 
 type Ledger struct {
 	version      int                `json:"version"`
+	Balance      float64            `json:"balance"`
 	Budgets      map[string]float64 `json:"budgets"`
 	Transactions Transactions       `json:"transactions"`
 }
@@ -35,7 +36,7 @@ type Transaction struct {
 func LoadLedger() (*Ledger, error) {
 	filepath := "/Users/guillaume/.config/ledger.json"
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return &Ledger{1, make(map[string]float64, 0), make([]Transaction, 0)}, nil
+		return &Ledger{1, 0, make(map[string]float64, 0), make([]Transaction, 0)}, nil
 	}
 	file, e := ioutil.ReadFile(filepath)
 	if e != nil {

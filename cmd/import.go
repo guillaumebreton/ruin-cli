@@ -17,13 +17,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/anupcshan/ofx"
+	"github.com/guillaumebreton/ruin/ofx"
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 	"os"
-	"regexp"
-	"strings"
 )
 
 // importCmd represents the import command
@@ -38,18 +35,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		bs, err := ioutil.ReadFile(args[0])
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-			os.Exit(1)
-		}
-
-		// Clean the files
-		str := strings.Replace(string(bs), ",", ".", -1)
-		re := regexp.MustCompile("(\\d)\\s(\\d)")
-		str = re.ReplaceAllString(str, "${1}${2}")
-
-		doc, err := ofx.Parse(strings.NewReader(str))
+		o, err := ofx.Parse(args[0])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
 			os.Exit(1)
@@ -61,12 +47,13 @@ to quickly create a Cobra application.`,
 		}
 		// TODO print the number of added task
 		count := 0
-		for _, tx := range doc.Transactions {
-			a, _ := tx.Amount.Value.Float64()
-			if l.Add(tx.ID, tx.PostedDate, tx.Type.String(), tx.Description, a) {
+		for _, tx := range o.Transactions {
+			a := tx.GetAmount()
+			if l.Add(tx.ID, tx.GetDate(), tx.TxType, tx.Description, a) {
 				count++
 			}
 		}
+		l.Balance = o.Balance
 		fmt.Printf("%d transactions added\n", count)
 		l.Save()
 	},
