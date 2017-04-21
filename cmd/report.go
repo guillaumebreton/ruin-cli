@@ -3,11 +3,12 @@ package cmd
 import (
 	"fmt"
 	"github.com/guillaumebreton/ruin/service"
-	"github.com/olekukonko/tablewriter"
+	"github.com/guillaumebreton/ruin/table"
 	"github.com/spf13/cobra"
 	"math"
 	"os"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -102,8 +103,8 @@ to quickly create a Cobra application.`,
 }
 
 func RenderReport(balance float64, report map[string]ReportBudget) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Category", "Current", "Future", "Status"})
+	table := table.NewTable()
+	table.SetHeader([]string{"CATEGORY", "CURRENT", "FUTURE", "STATUS"})
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -138,9 +139,9 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 			eom += left
 		}
 	}
-	table.Append([]string{"Balance", format(balance), format(balance - eom), ""})
-	table.SetAutoWrapText(false)
-	table.Render()
+	table.AppendSeparator()
+	table.Append([]string{"BALANCE", format(balance), format(balance - eom), ""})
+	table.Render(os.Stdout)
 }
 
 func format(v float64) string {
@@ -148,8 +149,8 @@ func format(v float64) string {
 }
 
 func RenderReportWithTransactions(report map[string]ReportBudget) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"#", "Category", "Spent"})
+	table := table.NewTable()
+	table.SetHeader([]string{"#", "CATEGORY", "SPENT"})
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -169,17 +170,18 @@ func RenderReportWithTransactions(report map[string]ReportBudget) {
 			spentTotal += sum
 			reservedTotal += -1 * v.Value
 			leftTotal += v.Value - math.Abs(sum)
-			table.Append([]string{"", v.Category, ""})
+			table.AppendSeparator()
+			table.Append([]string{"", strings.ToUpper(v.Category), ""})
+			table.AppendSeparator()
 			for _, t := range v.Transactions {
 				table.Append([]string{fmt.Sprintf("%d", t.Number), t.Description, fmt.Sprintf("%0.2f", t.Amount)})
 			}
-			table.Append([]string{"", "", fmt.Sprintf("%0.2f", sum)})
+			table.AppendSeparator()
+			table.Append([]string{"", "TOTAL", fmt.Sprintf("%0.2f", sum)})
 		}
 	}
 
-	// table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", spentTotal), fmt.Sprintf("%0.2f", reservedTotal), fmt.Sprintf("%0.2f", leftTotal)})
-	table.SetAutoWrapText(false)
-	table.Render()
+	table.Render(os.Stdout)
 }
 
 func init() {

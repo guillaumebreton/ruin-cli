@@ -110,14 +110,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/olekukonko/tablewriter",
-			"repository": "https://github.com/olekukonko/tablewriter",
-			"vcs": "git",
-			"revision": "febf2d34b54a69ce7530036c7503b1c9fbfdf0bb",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/pelletier/go-buffruneio",
 			"repository": "https://github.com/pelletier/go-buffruneio",
 			"vcs": "git",

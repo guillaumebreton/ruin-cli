@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/guillaumebreton/ruin/service"
-	"github.com/olekukonko/tablewriter"
+	"github.com/guillaumebreton/ruin/table"
 	"github.com/spf13/cobra"
 	"os"
 	"time"
@@ -70,19 +70,14 @@ to quickly create a Cobra application.`,
 }
 
 func RenderTransactionListText(transactions []service.Transaction) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"#", "Date", "Description", "Category", "Amount"})
+	table := table.NewTable()
+	table.SetHeader([]string{"#", "DATE", "DESCRIPTION", "CATEGORY", "AMOUNT"})
 	for _, v := range transactions {
 		table.Append([]string{fmt.Sprintf("%d", v.Number), v.Date.Format("2006-01-02"), v.Description, v.Category, fmt.Sprintf("%.2f", v.Amount)})
 	}
-	// table.SetAutoMergeCells(true)
-	table.SetAutoWrapText(false)
-	table.Render() // Send output
+	table.Render(os.Stdout) // Send output
 }
 
-func RenderTransactionListTemplate(transactions []service.Transaction) {
-	println("Render template")
-}
 func init() {
 	listCmd.AddCommand(listTransactionsCmd)
 
