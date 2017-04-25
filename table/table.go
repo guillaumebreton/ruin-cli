@@ -10,8 +10,11 @@ type Data struct {
 	data []string
 }
 type Table struct {
-	Rows   []Row
-	Header Data
+	Rows      []Row
+	Header    Data
+	Separator string
+	Border    bool
+	Align     bool
 }
 
 type Row interface {
