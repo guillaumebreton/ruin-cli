@@ -72,11 +72,14 @@ func (t *Table) Render(writer io.Writer) {
 	widths := t.computeCellWith()
 	s.render(writer, widths)
 	t.Header.render(writer, widths)
+	s.render(writer, widths)
 	t.AppendSeparator()
-	previousIsSeparator := false
+	previousIsSeparator := true
 	for _, r := range t.Rows {
 		_, isSeparator := r.(Separator)
-		if !isSeparator || !previousIsSeparator {
+		if !isSeparator {
+			r.render(writer, widths)
+		} else if !previousIsSeparator {
 			r.render(writer, widths)
 		}
 		previousIsSeparator = isSeparator
