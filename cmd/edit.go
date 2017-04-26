@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -25,6 +26,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 )
 
 // editCmd represents the edit command
@@ -52,11 +55,9 @@ to quickly create a Cobra application.`,
 			os.Exit(1)
 		}
 
-		// defer os.Remove(tmpfile.Name())
-		// clean up
-		// generate a hash of the file content
-		// generate all data in the file
-		_, content := GenerateData(l)
+		defer os.Remove(tmpfile.Name())
+		contentHash, content := GenerateData(l)
+
 		if _, err := tmpfile.Write([]byte(content)); err != nil {
 			// handle error
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
@@ -64,10 +65,10 @@ to quickly create a Cobra application.`,
 		}
 		editor := os.Getenv("EDITOR")
 		path, err := exec.LookPath(editor)
+
 		if err != nil {
-			fmt.Printf("Error %s while looking up for %s!!", path, editor)
+			fmt.Printf("Error %s while looking up for <%s>!!", path, editor)
 		}
-		fmt.Printf("%s is available at %s\nCalling it with file %s \n", editor, path, tmpfile.Name())
 
 		editorCmd := exec.Command(path, tmpfile.Name())
 		editorCmd.Stdin = os.Stdin
@@ -77,13 +78,54 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Printf("Start failed: %s", err)
 		}
-		fmt.Printf("Waiting for command to finish.\n")
 		err = editorCmd.Wait()
 		if err != nil {
 			fmt.Printf("Run failed: %s", err)
+		} else {
+			//load the file and check the
+			s, err := ioutil.ReadFile(tmpfile.Name())
+			if err != nil {
+				fmt.Printf("Read failed: %s", err)
+				os.Exit(1)
+			}
+
+			hasher := md5.New()
+			sh := hex.EncodeToString(hasher.Sum([]byte(s)))
+			if sh == contentHash {
+				fmt.Println("Nothing changed")
+				os.Exit(1)
+			}
+
+			file, err := os.Open(tmpfile.Name())
+			if err != nil {
+				fmt.Printf("Read failed: %s", err)
+				os.Exit(1)
+			}
+			defer file.Close()
+
+			budget := map[string]float64{}
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				t := scanner.Text()
+				if t == "" {
+					continue
+				}
+				arr := strings.Split(t, ":")
+				if len(arr) != 2 {
+					fmt.Printf("Read failed: %s", err)
+					os.Exit(1)
+				}
+				category := strings.TrimSpace(arr[0])
+				v, err := strconv.ParseFloat(strings.TrimSpace(arr[1]), 64)
+				if err != nil {
+					fmt.Printf("Parse failed: %s", err)
+					os.Exit(1)
+				}
+				budget[category] = v
+			}
+			l.Budgets = budget
+			l.Save()
 		}
-		// wait to see if the file has changed
-		// save the configuration for the budget
 	},
 }
 
@@ -95,9 +137,10 @@ func init() {
 func GenerateData(l *service.Ledger) (string, string) {
 	buf := bytes.NewBufferString("")
 	table := table.NewTable()
-	table.Separator = ":     "
-	table.Align = table.RIGHT
-	table.Border = ""
+	table.SetColumnSeparator(":     ")
+	table.SetRowSeparator("")
+	table.SetCenterSeparator("")
+	table.SetBorder(false)
 
 	var sum float64
 	for k, v := range l.Budgets {

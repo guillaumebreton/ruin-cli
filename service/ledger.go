@@ -46,6 +46,7 @@ func LoadLedger() (*Ledger, error) {
 	json.Unmarshal(file, &ledger)
 	return &ledger, nil
 }
+
 func (l *Ledger) Save() error {
 	filepath := "/Users/guillaume/.config/ledger.json"
 	t := Transactions(l.Transactions)

@@ -10,53 +10,79 @@ type Data struct {
 	data []string
 }
 type Table struct {
-	Rows      []Row
-	Header    Data
-	Separator string
-	Border    bool
-	Align     bool
+	Rows            []Row
+	Header          Data
+	CenterSeparator string
+	ColumnSeparator string
+	RowSeparator    string
+	Border          bool
 }
 
 type Row interface {
-	render(io.Writer, []int)
+	render(io.Writer, []int, *Table)
 }
 
-func (d Data) render(writer io.Writer, constraints []int) {
+func (d Data) render(writer io.Writer, constraints []int, t *Table) {
 	arr := make([]string, len(constraints))
 	for k, c := range d.data {
 		width := constraints[k]
 		format := fmt.Sprintf(" %% %ds ", width)
 		arr[k] = fmt.Sprintf(format, c)
 	}
-	render(writer, arr, "|")
+	t.render(writer, arr, t.ColumnSeparator)
 }
 
 type Separator struct {
 }
 
-func (s Separator) render(writer io.Writer, constraints []int) {
+func (s Separator) render(writer io.Writer, constraints []int, t *Table) {
 	arr := make([]string, len(constraints))
 	for k, c := range constraints {
-		s := "-"
+		s := t.RowSeparator
 		for i := 0; i < c; i++ {
-			s += "-"
+			s += t.RowSeparator
 		}
-		s += "-"
+		s += t.RowSeparator
 		arr[k] = s
 	}
-	render(writer, arr, "+")
+	t.render(writer, arr, t.CenterSeparator)
 }
 
-func render(writer io.Writer, data []string, separator string) {
-	s := separator + strings.Join(data, separator) + separator + "\n"
+func (t *Table) render(writer io.Writer, data []string, separator string) {
+	var s string
+	if t.Border {
+		s = separator + strings.Join(data, separator) + separator + "\n"
+	} else {
+		s = strings.Join(data, separator) + "\n"
+	}
 	writer.Write([]byte(s))
 }
 
 func NewTable() *Table {
 	return &Table{
-		Rows:   make([]Row, 0),
-		Header: Data{make([]string, 0)},
+		Rows:            make([]Row, 0),
+		Header:          Data{make([]string, 0)},
+		ColumnSeparator: "|",
+		RowSeparator:    "-",
+		CenterSeparator: "+",
+		Border:          true,
 	}
+}
+
+func (t *Table) SetBorder(b bool) {
+	t.Border = b
+}
+
+func (t *Table) SetCenterSeparator(s string) {
+	t.CenterSeparator = s
+}
+
+func (t *Table) SetColumnSeparator(s string) {
+	t.ColumnSeparator = s
+}
+
+func (t *Table) SetRowSeparator(s string) {
+	t.RowSeparator = s
 }
 
 func (t *Table) SetHeader(headers []string) {
@@ -73,22 +99,27 @@ func (t *Table) Render(writer io.Writer) {
 	s := Separator{}
 	//Get the maximum length of each cell
 	widths := t.computeCellWith()
-	s.render(writer, widths)
-	t.Header.render(writer, widths)
-	s.render(writer, widths)
+	if t.Border {
+		s.render(writer, widths, t)
+	}
+	if len(t.Header.data) > 0 {
+		t.Header.render(writer, widths, t)
+		s.render(writer, widths, t)
+	}
 	t.AppendSeparator()
 	previousIsSeparator := true
 	for _, r := range t.Rows {
 		_, isSeparator := r.(Separator)
 		if !isSeparator {
-			r.render(writer, widths)
+			r.render(writer, widths, t)
 		} else if !previousIsSeparator {
-			r.render(writer, widths)
+			r.render(writer, widths, t)
 		}
 		previousIsSeparator = isSeparator
 	}
-	t.AppendSeparator()
-
+	if t.Border {
+		s.render(writer, widths, t)
+	}
 }
 
 func (t *Table) computeCellWith() []int {
