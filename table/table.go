@@ -106,7 +106,6 @@ func (t *Table) Render(writer io.Writer) {
 		t.Header.render(writer, widths, t)
 		s.render(writer, widths, t)
 	}
-	t.AppendSeparator()
 	previousIsSeparator := true
 	for _, r := range t.Rows {
 		_, isSeparator := r.(Separator)
