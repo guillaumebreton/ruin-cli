@@ -26,7 +26,16 @@ func (d Data) render(writer io.Writer, constraints []int, t *Table) {
 	arr := make([]string, len(constraints))
 	for k, c := range d.data {
 		width := constraints[k]
-		format := fmt.Sprintf(" %% %ds ", width)
+		var format string
+		if t.Border && k == 0 {
+			format = fmt.Sprintf("%% %ds ", width)
+		} else if k == len(d.data)-1 {
+
+			format = fmt.Sprintf(" %% %ds", width)
+		} else {
+			format = fmt.Sprintf(" %% %ds ", width)
+
+		}
 		arr[k] = fmt.Sprintf(format, c)
 	}
 	t.render(writer, arr, t.ColumnSeparator)
