@@ -9,7 +9,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"time"
 )
 
 var reportEndDate string
@@ -33,34 +32,28 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		l, err := service.LoadLedger()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+		if len(args) != 1 {
+			fmt.Println("Need a budget name")
 			os.Exit(1)
 		}
-		f := service.NewFilter()
-		if reportEndDate != "" {
-			t, err := time.Parse("2006-01-02", reportEndDate)
-			if err != nil {
-				fmt.Println("Invalid end-date format")
-				os.Exit(1)
-			}
-			f.EndDate = t
+		name := args[0]
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "err: %v\n", err)
+			os.Exit(1)
 		}
-		if reportStartDate != "" {
-			t, err := time.Parse("2006-01-02", reportStartDate)
-			if err != nil {
-				fmt.Println("Invalid start-date format")
-				os.Exit(1)
-			}
-			f.StartDate = t
-		}
-		txs := l.GetTransactions(f)
 
 		// Get budgets
-		budgets := l.GetBudgets()
+		budget, err := l.GetBudget(name)
+		if err != nil {
+			fmt.Println("Budget not found")
+			os.Exit(1)
+		}
 
+		f := service.NewFilter()
+		f.StartDate = budget.StartDate.ToTime()
+		f.EndDate = budget.EndDate.ToTime()
+		txs := l.GetTransactions(f)
 		report := map[string]ReportBudget{}
 
 		for _, t := range txs {
@@ -78,7 +71,7 @@ to quickly create a Cobra application.`,
 			}
 		}
 
-		for c, v := range budgets {
+		for c, v := range budget.Values {
 			rb, ok := report[c]
 			if ok {
 				rb.Value = v
@@ -186,8 +179,6 @@ func RenderReportWithTransactions(report map[string]ReportBudget) {
 
 func init() {
 	RootCmd.AddCommand(reportCmd)
-	reportCmd.Flags().StringVarP(&reportStartDate, "start-date", "s", "", "the start date")
-	reportCmd.Flags().StringVarP(&reportEndDate, "end-date", "e", "", "the end date")
 	reportCmd.Flags().BoolVarP(&reportWithTransactions, "with-transactions", "t", false, "report budget with associated transactions")
 
 }

@@ -18,14 +18,14 @@ import (
 	"fmt"
 
 	"github.com/guillaumebreton/ruin/service"
+	"github.com/guillaumebreton/ruin/table"
 	"github.com/spf13/cobra"
 	"os"
-	"strconv"
 )
 
-// setBudgetCmd represents the set command
-var setBudgetCmd = &cobra.Command{
-	Use:   "set",
+// showCmd represents the show command
+var showCmd = &cobra.Command{
+	Use:   "show",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -34,24 +34,48 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		if len(args) < 2 {
-			fmt.Println("Need to provide a category and a value")
-			return
-		}
-		key := args[0]
-		value := args[1]
-		l, err := service.LoadLedger()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+		if len(args) != 1 {
+			fmt.Println("Need a name")
 			os.Exit(1)
 		}
-		v, _ := strconv.ParseFloat(value, 64)
-		l.SetBudget(key, v)
-		l.Save()
+		l, err := service.LoadLedger()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "err: %v\n", err)
+			os.Exit(1)
+		}
+		budget, err := l.GetBudget(args[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Budget name doesn't exist")
+			os.Exit(1)
+		}
+		RenderBudget(budget.Values)
 	},
 }
 
+func RenderBudget(values map[string]float64) {
+	table := table.NewTable()
+	table.SetHeader([]string{"CATEGORY", "VALUE"})
+	var sum float64 = 0
+	for k, v := range values {
+		sum += v
+		table.Append([]string{k, fmt.Sprintf("%0.2f", v)})
+	}
+	table.AppendSeparator()
+	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", sum)})
+	table.Render(os.Stdout)
+
+}
 func init() {
-	budgetCmd.AddCommand(setBudgetCmd)
+	RootCmd.AddCommand(showCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// showCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }

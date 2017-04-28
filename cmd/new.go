@@ -22,10 +22,10 @@ import (
 	"os"
 )
 
-// deleteCmd represents the delete command
-var deleteBudgetCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "Delete a budget on a category",
+// newCmd represents the new command
+var newCmd = &cobra.Command{
+	Use:   "new",
+	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -34,19 +34,24 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			fmt.Println("Need to provide a category")
-			return
+			fmt.Println("Need a name")
+			os.Exit(1)
 		}
 		l, err := service.LoadLedger()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+			fmt.Fprintf(os.Stderr, "err: %v\n", err)
 			os.Exit(1)
 		}
-		l.DeleteBudget(args[0])
+		err = l.AddBudget(args[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Budget name already exist")
+			os.Exit(1)
+		}
+		fmt.Printf("%s created", args[0])
 		l.Save()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(deleteBudgetCmd)
+	RootCmd.AddCommand(newCmd)
 }

@@ -42,6 +42,12 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		if len(args) != 1 {
+			fmt.Println("Need a name")
+			os.Exit(1)
+		}
+		name := args[0]
+
 		l, err := service.LoadLedger()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
@@ -103,7 +109,7 @@ to quickly create a Cobra application.`,
 			}
 			defer file.Close()
 
-			budget := map[string]float64{}
+			budget := service.NewBudget()
 			scanner := bufio.NewScanner(file)
 			for scanner.Scan() {
 				t := scanner.Text()
@@ -121,9 +127,9 @@ to quickly create a Cobra application.`,
 					fmt.Printf("Parse failed: %s", err)
 					os.Exit(1)
 				}
-				budget[category] = v
+				budget.Set(category, v)
 			}
-			l.Budgets = budget
+			l.Budgets[name] = budget
 			l.Save()
 		}
 	},
@@ -142,9 +148,7 @@ func GenerateData(l *service.Ledger) (string, string) {
 	table.SetCenterSeparator("")
 	table.SetBorder(false)
 
-	var sum float64
 	for k, v := range l.Budgets {
-		sum += v
 		table.Append([]string{k, fmt.Sprintf("%.2f", v)})
 	}
 	table.Render(buf) // Send output

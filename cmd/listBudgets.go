@@ -26,19 +26,14 @@ var listBudgetsCmd = &cobra.Command{
 
 func init() {
 	listCmd.AddCommand(listBudgetsCmd)
-	listBudgetsCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
 
 }
 
-func RenderBudgetsListText(budgets service.Budgets) {
+func RenderBudgetsListText(budgets map[string]service.Budget) {
 	table := table.NewTable()
-	table.SetHeader([]string{"CATEGORY", "VALUE"})
-	var sum float64
+	table.SetHeader([]string{"CATEGORY", "FROM", "TO"})
 	for k, v := range budgets {
-		sum += v
-		table.Append([]string{k, fmt.Sprintf("%.2f", v)})
+		table.Append([]string{k, fmt.Sprintf("%s", v.StartDate.ToString()), fmt.Sprintf("%s", v.EndDate.ToString())})
 	}
-	table.AppendSeparator()
-	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", sum)})
-	table.Render(os.Stdout) // Send output
+	table.Render(os.Stdout)
 }
