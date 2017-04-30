@@ -38,7 +38,7 @@ var modifyCmd = &cobra.Command{
 		var d time.Time
 		var err error
 		if len(args) != 1 {
-			fmt.Println("Please proive a list of transaction id")
+			fmt.Println("Please provide a list of transaction ids")
 			os.Exit(1)
 		}
 		if modifyDate != "" {
@@ -75,7 +75,7 @@ var modifyCmd = &cobra.Command{
 				}
 			}
 		}
-		fmt.Printf("Transaction %s Updated\n", args[0])
+		fmt.Printf("Transaction %s updated\n", args[0])
 		l.Save()
 	},
 }

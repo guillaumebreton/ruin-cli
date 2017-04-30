@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -25,20 +23,10 @@ var listOutputFormat string
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Allows to list budgets and transactions",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("list called")
-	},
+	Short: "List budgets or transactions",
+	Long:  "",
 }
 
 func init() {
 	RootCmd.AddCommand(listCmd)
-	listCmd.PersistentFlags().StringVarP(&listOutputFormat, "output", "o", "text", "set the ouput format of the command")
 }
