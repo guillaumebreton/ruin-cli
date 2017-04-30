@@ -89,7 +89,7 @@ func (t *Table) Render(writer io.Writer) {
 }
 
 func (t *Table) computeCellWith() []int {
-	max := 0
+	max := len(t.Header.data)
 	for _, v := range t.Rows {
 		if r, ok := v.(Data); ok {
 			if len(r.data) > max {
@@ -98,6 +98,9 @@ func (t *Table) computeCellWith() []int {
 		}
 	}
 	widths := make([]int, max)
+	for k, v := range t.Header.data {
+		widths[k] = len(v)
+	}
 	for _, v := range t.Rows {
 		if r, ok := v.(Data); ok {
 			for j, s := range r.data {
