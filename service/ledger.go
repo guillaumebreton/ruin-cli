@@ -9,12 +9,14 @@ import (
 	"time"
 )
 
-type Transactions []Transaction
+var ShortFormat = "2006-01-02"
+
+type Transactions []*Transaction
 type Budgets map[string]float64
 
 func (a Transactions) Len() int           { return len(a) }
 func (a Transactions) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Transactions) Less(i, j int) bool { return a[i].Date.After(a[j].Date) }
+func (a Transactions) Less(i, j int) bool { return a[i].GetDate().After(a[j].GetDate()) }
 
 type Ledger struct {
 	version      int                `json:"version"`
@@ -29,14 +31,22 @@ type Transaction struct {
 	Amount      float64   `json:"amount"`
 	Description string    `json:"description"`
 	Date        time.Time `json:"date"`
+	UserDate    time.Time `json:"user-date"`
 	Type        string    `json:"type"`
 	Category    string    `json:"category"`
+}
+
+func (t *Transaction) GetDate() time.Time {
+	if !t.UserDate.After(time.Time{}) {
+		return t.Date
+	}
+	return t.UserDate
 }
 
 func LoadLedger() (*Ledger, error) {
 	filepath := "/Users/guillaume/.config/ledger.json"
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return &Ledger{1, 0, make(map[string]float64, 0), make([]Transaction, 0)}, nil
+		return &Ledger{1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}, nil
 	}
 	file, e := ioutil.ReadFile(filepath)
 	if e != nil {
@@ -54,7 +64,10 @@ func (l *Ledger) Save() error {
 		v.Number = k + 1
 		t[k] = v
 	}
-	j, _ := json.Marshal(l)
+	j, err := json.Marshal(l)
+	if err != nil {
+		return err
+	}
 	return ioutil.WriteFile(filepath, j, 770)
 }
 func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
@@ -63,12 +76,13 @@ func (l *Ledger) Add(ID string, date time.Time, txtype string, description strin
 		transaction := Transaction{
 			ID:          ID,
 			Date:        date,
+			UserDate:    date,
 			Description: description,
 			Amount:      amount,
 			Type:        txtype,
 			Category:    "",
 		}
-		l.Transactions = append(l.Transactions, transaction)
+		l.Transactions = append(l.Transactions, &transaction)
 		return true
 	} else {
 		t.ID = ID
@@ -80,22 +94,35 @@ func (l *Ledger) Add(ID string, date time.Time, txtype string, description strin
 	}
 }
 
+//TODO rename in GetById
 func (l *Ledger) Get(ID string) *Transaction {
 	for _, t := range l.Transactions {
 		if t.ID == ID {
-			return &t
+			return t
 		}
 	}
 	return nil
 
 }
 
+// TODO remove this
 func (l *Ledger) SetCategory(number int, category string) error {
 
 	for k, t := range l.Transactions {
 		if t.Number == number {
 			t.Category = category
 			l.Transactions[k] = t
+			return nil
+		}
+	}
+	return fmt.Errorf("Transaction %d not found", number)
+}
+
+func (l *Ledger) UpdateTransaction(number int, tx *Transaction) error {
+
+	for k, t := range l.Transactions {
+		if t.Number == number {
+			l.Transactions[k] = tx
 			return nil
 		}
 	}
@@ -112,15 +139,15 @@ func NewFilter() *Filter {
 	return &Filter{}
 }
 
-func (f *Filter) IsFiltered(transaction Transaction) bool {
+func (f *Filter) IsFiltered(transaction *Transaction) bool {
 	// fmt.Printf("%v %v\n", transaction.Date, f.StartDate)
 	if f.StartDate.After(time.Time{}) {
-		if transaction.Date.Before(f.StartDate) {
+		if transaction.GetDate().Before(f.StartDate) {
 			return true
 		}
 	}
 	if f.EndDate.After(time.Time{}) {
-		if transaction.Date.After(f.EndDate) {
+		if transaction.GetDate().After(f.EndDate) {
 			return true
 		}
 	}
@@ -132,11 +159,19 @@ func (f *Filter) IsFiltered(transaction Transaction) bool {
 	}
 	return false
 }
+func (l *Ledger) GetTransaction(number int) (*Transaction, error) {
+	for _, v := range l.Transactions {
+		if v.Number == number {
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("%s not found")
+}
 
 func (l *Ledger) GetTransactions(f *Filter) Transactions {
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
-	result := []Transaction{}
+	result := []*Transaction{}
 	for _, tx := range t {
 		if !f.IsFiltered(tx) {
 			result = append(result, tx)

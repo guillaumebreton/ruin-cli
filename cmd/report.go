@@ -72,7 +72,7 @@ to quickly create a Cobra application.`,
 				rb = ReportBudget{
 					Category:     t.Category,
 					Value:        0,
-					Transactions: []service.Transaction{t},
+					Transactions: []*service.Transaction{t},
 				}
 				report[t.Category] = rb
 			}
@@ -87,7 +87,7 @@ to quickly create a Cobra application.`,
 				rb := ReportBudget{
 					Category:     c,
 					Value:        v,
-					Transactions: []service.Transaction{},
+					Transactions: []*service.Transaction{},
 				}
 				report[c] = rb
 			}
@@ -102,7 +102,7 @@ to quickly create a Cobra application.`,
 	},
 }
 
-func RenderReport(balance float64, report map[string]ReportBudget) {
+func RenderReport(report map[string]ReportBudget) {
 	table := table.NewTable()
 	table.SetHeader([]string{"CATEGORY", "CURRENT", "FUTURE", "STATUS"})
 
