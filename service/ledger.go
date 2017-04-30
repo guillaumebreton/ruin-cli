@@ -34,6 +34,7 @@ type Transaction struct {
 	UserDate    time.Time `json:"user-date"`
 	Type        string    `json:"type"`
 	Category    string    `json:"category"`
+	Balance     float64   `json:"balance"`
 }
 
 func (t *Transaction) GetDate() time.Time {
@@ -60,8 +61,11 @@ func (l *Ledger) Save() error {
 	filepath := "/Users/guillaume/.config/ledger.json"
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
+	previousBalance := l.Balance
 	for k, v := range t {
 		v.Number = k + 1
+		v.Balance = previousBalance
+		previousBalance = previousBalance - v.Amount
 		t[k] = v
 	}
 	j, err := json.Marshal(l)

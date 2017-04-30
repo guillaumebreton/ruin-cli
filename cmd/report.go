@@ -97,12 +97,13 @@ to quickly create a Cobra application.`,
 		if reportWithTransactions {
 			RenderReportWithTransactions(report)
 		} else {
-			RenderReport(l.Balance, report)
+			balance := txs[0].Balance
+			RenderReport(balance, report)
 		}
 	},
 }
 
-func RenderReport(report map[string]ReportBudget) {
+func RenderReport(balance float64, report map[string]ReportBudget) {
 	table := table.NewTable()
 	table.SetHeader([]string{"CATEGORY", "CURRENT", "FUTURE", "STATUS"})
 
