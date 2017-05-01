@@ -8,25 +8,18 @@ import (
 	"os"
 )
 
-// listCmd represents the list command
+// listBCmd represents the list command
 var listBudgetsCmd = &cobra.Command{
 	Use:   "budgets",
 	Short: "List all the budgets",
-	Long:  `Define`,
 	Run: func(cmd *cobra.Command, args []string) {
-		l, err := service.LoadLedger()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-			os.Exit(1)
-		}
-		budgets := l.GetBudgets()
+		budgets := ledger.GetBudgets()
 		RenderBudgetsListText(budgets)
 	},
 }
 
 func init() {
 	listCmd.AddCommand(listBudgetsCmd)
-	listBudgetsCmd.Flags().StringP("format", "f", "text", "Defines the rendering format")
 
 }
 

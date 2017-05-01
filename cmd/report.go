@@ -34,11 +34,6 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		l, err := service.LoadLedger()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-			os.Exit(1)
-		}
 		f := service.NewFilter()
 		if reportEndDate != "" {
 			t, err := time.Parse("2006-01-02", reportEndDate)
@@ -56,10 +51,10 @@ to quickly create a Cobra application.`,
 			}
 			f.StartDate = t
 		}
-		txs := l.GetTransactions(f)
+		txs := ledger.GetTransactions(f)
 
 		// Get budgets
-		budgets := l.GetBudgets()
+		budgets := ledger.GetBudgets()
 
 		report := map[string]ReportBudget{}
 

@@ -44,8 +44,7 @@ func (t *Transaction) GetDate() time.Time {
 	return t.UserDate
 }
 
-func LoadLedger() (*Ledger, error) {
-	filepath := "/Users/guillaume/.config/ledger.json"
+func LoadLedger(filepath string) (*Ledger, error) {
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		return &Ledger{1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}, nil
 	}

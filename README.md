@@ -1,35 +1,17 @@
-# gobud
-Budget check and generator tool
+ruin tx -s 2017-03-30
+ruin budgets
+ruin budget test -a test
+ruin txs
+ruin categories
+ruin category test -r test
 
-usage 
+vs
 
-gobud budget check data.csv : som + eom by default
-gobud budget set category 1000 : set the value of a budget
-gobud budget budget list : list all budgets
-gobud budget remove category : remove a budget
-
-gobud init : initialize the field value
-
-gobud import ofx
-    - add all transaction to a ledger.json file
-    - for every unknown transaction ask for a category
-    - List all category before asking for category
-
-# test
-
-gobud list-budget
-gobud budget list
-gobud budget set
-gobud budget report  --start --end
-gobud budget delete
-
-gobug tx import
-gobud tx category 1 alimentation
-gobud tx list --start=test --end= 1 1end
-
-gobud set-category 1,2,3
-gobud set-budget
-gobud list-budgets
-gobud tx
-gobud import
-gobud 
+ruin list tx
+ruin list budgets
+ruin report
+ruin modigy tx 1,2,4 -c category
+ruin modify category 1 -n test
+ruin modigy budget test -v aaa
+ruin delete category test
+ruin delete budget test

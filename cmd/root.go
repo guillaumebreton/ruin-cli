@@ -1,35 +1,20 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var ledgerFile string
+var ledger *service.Ledger
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "gobud",
-	Short: "Generates budget data from csv file",
-	Long:  ``,
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Use:   "ruin",
+	Short: "Generates budget data from ofx files",
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -42,34 +27,16 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
-
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/gobud.json)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// RootCmd.Flags().StringP("format", "f", "json", "Output format")
-	// RootCmd.Flags().StringP("start-date", "s", "", "Help message for toggle")
-	// RootCmd.Flags().StringP("end-date", "e", "", "Help message for toggle")
+	cobra.OnInitialize(initLedger)
+	RootCmd.PersistentFlags().StringVar(&ledgerFile, "file", "ruin.json", "Ledger file")
 }
 
-// initConfig reads in config file and ENV variables if set.
-// TODO extract in a service
-func initConfig() {
-	viper.SetConfigName("gobud")         // name of config file (without extension)
-	viper.AddConfigPath(".")             // adding home directory as first search path
-	viper.AddConfigPath("$HOME/.config") // adding home directory as first search path
-	viper.AutomaticEnv()                 // read in environment variables that match
+func initLedger() {
 
-	if cfgFile != "" { // enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
-	}
-	//TODO add default values for the configuration
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Cannot load config file : %+v\n", err)
+	var err error
+	ledger, err = service.LoadLedger(ledgerFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Err: %v\n", err)
+		os.Exit(1)
 	}
 }
