@@ -9,9 +9,9 @@ import (
 )
 
 // setBudgetCmd represents the set command
-var setBudgetCmd = &cobra.Command{
-	Use:   "set",
-	Short: "set a limit",
+var modifyBudgetCmd = &cobra.Command{
+	Use:   "budget",
+	Short: "Modify a budget",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 2 {
 			fmt.Fprintf(os.Stderr, "Need to provide a category and a value")
@@ -26,5 +26,6 @@ var setBudgetCmd = &cobra.Command{
 }
 
 func init() {
-	budgetCmd.AddCommand(setBudgetCmd)
+	modifyCmd.AddCommand(modifyBudgetCmd)
+	modifyBudgetCmd.Flags().StringVarP(&modifyCategory, "category", "c", "", "Set the transaction category")
 }

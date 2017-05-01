@@ -9,8 +9,8 @@ import (
 
 // renameCategoryCmd represents the renameCategory command
 var renameCategoryCmd = &cobra.Command{
-	Use:   "rename",
-	Short: "Rename a category",
+	Use:   "category",
+	Short: "Modify a category",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 2 {
 			fmt.Fprintf(os.Stderr, "Please provide a category name and its new name")
@@ -22,5 +22,5 @@ var renameCategoryCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(renameCategoryCmd)
+	modifyCmd.AddCommand(renameCategoryCmd)
 }
