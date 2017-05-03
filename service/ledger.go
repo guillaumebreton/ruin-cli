@@ -14,9 +14,11 @@ var ShortFormat = "2006-01-02"
 type Transactions []*Transaction
 type Budgets map[string]float64
 
-func (a Transactions) Len() int           { return len(a) }
-func (a Transactions) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Transactions) Less(i, j int) bool { return a[i].GetDate().After(a[j].GetDate()) }
+func (a Transactions) Len() int      { return len(a) }
+func (a Transactions) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a Transactions) Less(i, j int) bool {
+	return a[i].Number > a[j].Number && a[i].GetDate().After(a[j].GetDate())
+}
 
 type Ledger struct {
 	version      int                `json:"version"`
