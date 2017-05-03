@@ -44,9 +44,13 @@ func (t *Transaction) GetDate() time.Time {
 	return t.UserDate
 }
 
+func NewLedger() *Ledger {
+	return &Ledger{1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}
+}
+
 func LoadLedger(filepath string) (*Ledger, error) {
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return &Ledger{1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}, nil
+		return nil, fmt.Errorf("Fail to load ledger")
 	}
 	file, e := ioutil.ReadFile(filepath)
 	if e != nil {
@@ -56,8 +60,7 @@ func LoadLedger(filepath string) (*Ledger, error) {
 	json.Unmarshal(file, &ledger)
 	return &ledger, nil
 }
-func (l *Ledger) Save() error {
-	filepath := "/Users/guillaume/.config/ledger.json"
+func (l *Ledger) Save(filepath string) error {
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
 	previousBalance := l.Balance

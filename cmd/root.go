@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/user"
 
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/spf13/cobra"
@@ -28,15 +29,26 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initLedger)
-	RootCmd.PersistentFlags().StringVar(&ledgerFile, "file", "ruin.json", "Ledger file")
+	RootCmd.PersistentFlags().StringVar(&ledgerFile, "file", "$HOME/.ruin.json", "Ledger file")
 }
 
 func initLedger() {
-
 	var err error
 	ledger, err = service.LoadLedger(ledgerFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-		os.Exit(1)
+		if ledgerFile == "$HOME/.ruin.json" {
+			ledger = service.NewLedger()
+			usr, err := user.Current()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Fail to obtain user home directory")
+			}
+			ledgerFile = usr.HomeDir + "/.ruin.json"
+			err = ledger.Save(ledgerFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Fail to create initial file")
+				os.Exit(1)
+			}
+			ledger, _ = service.LoadLedger(ledgerFile)
+		}
 	}
 }

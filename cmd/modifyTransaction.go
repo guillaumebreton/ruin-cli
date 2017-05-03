@@ -56,7 +56,7 @@ var modifyTransactionCmd = &cobra.Command{
 			}
 		}
 		fmt.Printf("Transaction %s updated\n", args[0])
-		ledger.Save()
+		ledger.Save(ledgerFile)
 	},
 }
 

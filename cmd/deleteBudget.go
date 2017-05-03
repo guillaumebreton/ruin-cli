@@ -18,7 +18,7 @@ var deleteBudgetCmd = &cobra.Command{
 
 		}
 		ledger.DeleteBudget(args[0])
-		ledger.Save()
+		ledger.Save(ledgerFile)
 	},
 }
 

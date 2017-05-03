@@ -21,7 +21,7 @@ var modifyBudgetCmd = &cobra.Command{
 		value := args[1]
 		v, _ := strconv.ParseFloat(value, 64)
 		ledger.SetBudget(key, v)
-		ledger.Save()
+		ledger.Save(ledgerFile)
 	},
 }
 

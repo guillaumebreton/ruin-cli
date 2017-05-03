@@ -8,7 +8,7 @@ import (
 )
 
 // renameCategoryCmd represents the renameCategory command
-var renameCategoryCmd = &cobra.Command{
+var modifyCategoryCmd = &cobra.Command{
 	Use:   "category",
 	Short: "Modify a category",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -17,10 +17,10 @@ var renameCategoryCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		ledger.RenameCategory(args[0], args[1])
-		ledger.Save()
+		ledger.Save(ledgerFile)
 	},
 }
 
 func init() {
-	modifyCmd.AddCommand(renameCategoryCmd)
+	modifyCmd.AddCommand(modifyCategoryCmd)
 }

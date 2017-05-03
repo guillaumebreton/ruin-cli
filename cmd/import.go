@@ -27,7 +27,7 @@ var importCmd = &cobra.Command{
 			}
 		}
 		ledger.Balance = o.Balance
-		ledger.Save()
+		ledger.Save(ledgerFile)
 		fmt.Printf("%d transaction(s) added\n", count)
 	},
 }
