@@ -92,8 +92,12 @@ to quickly create a Cobra application.`,
 		if reportWithTransactions {
 			RenderReportWithTransactions(report)
 		} else {
-			balance := txs[0].Balance
-			RenderReport(balance, report)
+			if len(txs) > 0 {
+				RenderReport(txs[0].Balance, report)
+			} else {
+
+				RenderReport(0, report)
+			}
 		}
 	},
 }
