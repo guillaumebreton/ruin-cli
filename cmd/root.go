@@ -43,12 +43,15 @@ func initLedger() {
 				fmt.Fprintf(os.Stderr, "Fail to obtain user home directory")
 			}
 			ledgerFile = usr.HomeDir + "/.ruin.json"
-			err = ledger.Save(ledgerFile)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Fail to create initial file")
-				os.Exit(1)
+			if _, err := os.Stat(ledgerFile); os.IsNotExist(err) {
+				err = ledger.Save(ledgerFile)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Fail to create initial file")
+					os.Exit(1)
+				}
 			}
 			ledger, _ = service.LoadLedger(ledgerFile)
+
 		}
 	}
 }
