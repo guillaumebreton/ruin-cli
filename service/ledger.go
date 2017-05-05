@@ -17,7 +17,7 @@ type Budgets map[string]float64
 func (a Transactions) Len() int      { return len(a) }
 func (a Transactions) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a Transactions) Less(i, j int) bool {
-	return a[i].Number > a[j].Number && a[i].GetDate().After(a[j].GetDate())
+	return a[i].GetDate().After(a[j].GetDate()) && a[i].Number > a[j].Number
 }
 
 type Ledger struct {
@@ -66,12 +66,15 @@ func (l *Ledger) Save(filepath string) error {
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
 	previousBalance := l.Balance
+	// reindex
 	for k, v := range t {
 		v.Number = k + 1
 		v.Balance = previousBalance
 		previousBalance = previousBalance - v.Amount
 		t[k] = v
 	}
+	// sort the array again after reindexing
+	sort.Sort(t)
 	j, err := json.Marshal(l)
 	if err != nil {
 		return err
