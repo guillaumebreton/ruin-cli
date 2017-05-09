@@ -21,7 +21,7 @@ var showTxCmd = &cobra.Command{
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s not found", args[0])
 		} else {
-			tx, err := ledger.GetTransaction(id)
+			tx, err := ledger.GetTransactionByNumber(id)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%d not found", id)
 				os.Exit(1)

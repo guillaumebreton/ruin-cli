@@ -83,7 +83,7 @@ func (l *Ledger) Save(filepath string) error {
 }
 
 func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
-	t := l.Get(ID)
+	t := l.GetTransactionById(ID)
 	if t == nil {
 		transaction := Transaction{
 			ID:          ID,
@@ -104,30 +104,6 @@ func (l *Ledger) Add(ID string, date time.Time, txtype string, description strin
 		t.Amount = amount
 		return false
 	}
-}
-
-//TODO rename in GetById
-func (l *Ledger) Get(ID string) *Transaction {
-	for _, t := range l.Transactions {
-		if t.ID == ID {
-			return t
-		}
-	}
-	return nil
-
-}
-
-// TODO remove this
-func (l *Ledger) SetCategory(number int, category string) error {
-
-	for k, t := range l.Transactions {
-		if t.Number == number {
-			t.Category = category
-			l.Transactions[k] = t
-			return nil
-		}
-	}
-	return fmt.Errorf("Transaction %d not found", number)
 }
 
 func (l *Ledger) UpdateTransaction(number int, tx *Transaction) error {
@@ -170,7 +146,16 @@ func (f *Filter) IsFiltered(transaction *Transaction) bool {
 	}
 	return false
 }
-func (l *Ledger) GetTransaction(number int) (*Transaction, error) {
+func (l *Ledger) GetTransactionById(ID string) *Transaction {
+	for _, t := range l.Transactions {
+		if t.ID == ID {
+			return t
+		}
+	}
+	return nil
+
+}
+func (l *Ledger) GetTransactionByNumber(number int) (*Transaction, error) {
 	for _, v := range l.Transactions {
 		if v.Number == number {
 			return v, nil

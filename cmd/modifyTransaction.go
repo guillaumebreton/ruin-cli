@@ -40,7 +40,7 @@ var modifyTransactionCmd = &cobra.Command{
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s not found", v)
 			} else {
-				tx, err := ledger.GetTransaction(id)
+				tx, err := ledger.GetTransactionByNumber(id)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "%d not found", id)
 				} else {
