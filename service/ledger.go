@@ -17,7 +17,7 @@ type Budgets map[string]float64
 func (a Transactions) Len() int      { return len(a) }
 func (a Transactions) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a Transactions) Less(i, j int) bool {
-	return a[i].GetDate().After(a[j].GetDate()) && a[i].Number > a[j].Number
+	return a[i].GetDate().After(a[j].GetDate()) //&& a[i].Number > a[j].Number
 }
 
 type Ledger struct {
@@ -62,6 +62,7 @@ func LoadLedger(filepath string) (*Ledger, error) {
 	json.Unmarshal(file, &ledger)
 	return &ledger, nil
 }
+
 func (l *Ledger) Save(filepath string) error {
 	t := Transactions(l.Transactions)
 	sort.Sort(t)
@@ -73,14 +74,14 @@ func (l *Ledger) Save(filepath string) error {
 		previousBalance = previousBalance - v.Amount
 		t[k] = v
 	}
-	// sort the array again after reindexing
-	sort.Sort(t)
+	l.Transactions = t
 	j, err := json.Marshal(l)
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(filepath, j, 770)
 }
+
 func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
 	t := l.Get(ID)
 	if t == nil {
@@ -151,7 +152,6 @@ func NewFilter() *Filter {
 }
 
 func (f *Filter) IsFiltered(transaction *Transaction) bool {
-	// fmt.Printf("%v %v\n", transaction.Date, f.StartDate)
 	if f.StartDate.After(time.Time{}) {
 		if transaction.GetDate().Before(f.StartDate) {
 			return true
@@ -181,7 +181,6 @@ func (l *Ledger) GetTransaction(number int) (*Transaction, error) {
 
 func (l *Ledger) GetTransactions(f *Filter) Transactions {
 	t := Transactions(l.Transactions)
-	sort.Sort(t)
 	result := []*Transaction{}
 	for _, tx := range t {
 		if !f.IsFiltered(tx) {
