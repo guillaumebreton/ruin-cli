@@ -79,7 +79,7 @@ func (l *Ledger) Save(filepath string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath, j, 770)
+	return ioutil.WriteFile(filepath, j, 0644)
 }
 
 func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
