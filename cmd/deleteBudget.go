@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // deleteBudgetCmd represents the delete command
@@ -13,12 +11,11 @@ var deleteBudgetCmd = &cobra.Command{
 	Short: "Delete a budget",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			fmt.Fprintf(os.Stderr, "Please to provide a category")
-			os.Exit(1)
-
+			util.Exit("Please to provide a category")
 		}
 		ledger.DeleteBudget(args[0])
-		ledger.Save(ledgerFile)
+		err := ledger.Save(ledgerFile)
+		util.ExitOnError(err, "Fail to save ledger")
 	},
 }
 

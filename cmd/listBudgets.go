@@ -33,5 +33,5 @@ func RenderBudgetsListText(budgets service.Budgets) {
 	}
 	table.AppendSeparator()
 	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", sum)})
-	table.Render(os.Stdout) // Send output
+	table.Render(os.Stdout)
 }

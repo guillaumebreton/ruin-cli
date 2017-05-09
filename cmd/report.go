@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/guillaumebreton/ruin/table"
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 	"math"
 	"os"
@@ -31,18 +32,12 @@ var reportCmd = &cobra.Command{
 		f := service.NewFilter()
 		if reportEndDate != "" {
 			t, err := time.Parse("2006-01-02", reportEndDate)
-			if err != nil {
-				fmt.Println("Invalid end-date format")
-				os.Exit(1)
-			}
+			util.ExitOnError(err, "Invalid end-date format")
 			f.EndDate = t
 		}
 		if reportStartDate != "" {
 			t, err := time.Parse("2006-01-02", reportStartDate)
-			if err != nil {
-				fmt.Println("Invalid start-date format")
-				os.Exit(1)
-			}
+			util.ExitOnError(err, "Invalid start-date format")
 			f.StartDate = t
 		}
 		txs := ledger.GetTransactions(f)

@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"fmt"
-
 	"github.com/guillaumebreton/ruin/ofx"
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // importCmd represents the import command
@@ -15,10 +14,7 @@ var importCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		o, err := ofx.Parse(args[0])
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-			os.Exit(1)
-		}
+		util.ExitOnError(err, "Fail to parse OFX file")
 		count := 0
 		for _, tx := range o.Transactions {
 			a := tx.GetAmount()
@@ -28,11 +24,7 @@ var importCmd = &cobra.Command{
 		}
 		ledger.Balance = o.Balance
 		err = ledger.Save(ledgerFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Err: %v\n", err)
-			os.Exit(1)
-
-		}
+		util.ExitOnError(err, "Fail to save ledger")
 		fmt.Printf("%d transaction(s) added\n", count)
 	},
 }

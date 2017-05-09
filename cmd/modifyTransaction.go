@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/guillaumebreton/ruin/service"
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 	"os"
 	"strconv"
@@ -23,16 +24,11 @@ var modifyTransactionCmd = &cobra.Command{
 		var d time.Time
 		var err error
 		if len(args) != 1 {
-			fmt.Fprintf(os.Stderr, "Please provide a list of transaction ids")
-			os.Exit(1)
+			util.Exit("Please provide a list of transaction ids")
 		}
 		if modifyDate != "" {
 			d, err = time.Parse(service.ShortFormat, modifyDate)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Invalid date : %s", modifyDate)
-				os.Exit(1)
-			}
-
+			util.ExitOnError(err, "Invalid date")
 		}
 		arr := strings.Split(args[0], ",")
 		for _, v := range arr {
@@ -48,7 +44,6 @@ var modifyTransactionCmd = &cobra.Command{
 						tx.Category = modifyCategory
 					}
 					if modifyDate != "" {
-						println("Set date")
 						tx.UserDate = d
 					}
 					ledger.UpdateTransaction(id, tx)
@@ -56,7 +51,8 @@ var modifyTransactionCmd = &cobra.Command{
 			}
 		}
 		fmt.Printf("Transaction %s updated\n", args[0])
-		ledger.Save(ledgerFile)
+		err = ledger.Save(ledgerFile)
+		util.ExitOnError(err, "Fail to save file")
 	},
 }
 

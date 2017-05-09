@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/guillaumebreton/ruin/service"
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 	"os"
 	"strconv"
@@ -14,18 +15,14 @@ var showTxCmd = &cobra.Command{
 	Short: "Show a transaction",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			fmt.Fprintf(os.Stderr, "Please provide a transaction id")
-			os.Exit(1)
+			util.Exit("Please provide transaction id")
 		}
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s not found", args[0])
 		} else {
 			tx, err := ledger.GetTransactionByNumber(id)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%d not found", id)
-				os.Exit(1)
-			}
+			util.ExitOnError(err, "Transaction not found")
 			RenderShowTransaction(tx)
 		}
 	},

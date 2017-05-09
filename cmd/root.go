@@ -6,6 +6,7 @@ import (
 	"os/user"
 
 	"github.com/guillaumebreton/ruin/service"
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 )
 
@@ -33,22 +34,16 @@ func init() {
 }
 
 func initLedger() {
-	var err error
-	ledger, err = service.LoadLedger(ledgerFile)
+	ledger, err := service.LoadLedger(ledgerFile)
 	if err != nil {
 		if ledgerFile == "$HOME/.ruin.json" {
 			ledger = service.NewLedger()
 			usr, err := user.Current()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Fail to obtain user home directory")
-			}
+			util.ExitOnError(err, "Fail to obtain user home directory")
 			ledgerFile = usr.HomeDir + "/.ruin.json"
 			if _, err := os.Stat(ledgerFile); os.IsNotExist(err) {
 				err = ledger.Save(ledgerFile)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Fail to create initial file")
-					os.Exit(1)
-				}
+				util.ExitOnError(err, "Fail to create initial file")
 			}
 			ledger, _ = service.LoadLedger(ledgerFile)
 

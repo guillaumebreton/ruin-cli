@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // renameCategoryCmd represents the renameCategory command
@@ -13,8 +11,7 @@ var modifyCategoryCmd = &cobra.Command{
 	Short: "Modify a category",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 2 {
-			fmt.Fprintf(os.Stderr, "Please provide a category name and its new name")
-			os.Exit(1)
+			util.Exit("Please provide a category name and its new name")
 		}
 		ledger.RenameCategory(args[0], args[1])
 		ledger.Save(ledgerFile)
