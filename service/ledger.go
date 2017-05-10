@@ -165,9 +165,8 @@ func (l *Ledger) GetTransactionByNumber(number int) (*Transaction, error) {
 }
 
 func (l *Ledger) GetTransactions(f *Filter) Transactions {
-	t := Transactions(l.Transactions)
 	result := []*Transaction{}
-	for _, tx := range t {
+	for _, tx := range l.Transactions {
 		if !f.IsFiltered(tx) {
 			result = append(result, tx)
 		}
