@@ -17,7 +17,7 @@ type Budgets map[string]float64
 func (a Transactions) Len() int      { return len(a) }
 func (a Transactions) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a Transactions) Less(i, j int) bool {
-	return a[i].GetDate().After(a[j].GetDate()) //&& a[i].Number > a[j].Number
+	return a[i].GetDate().After(a[j].GetDate()) && a[i].ID > a[j].ID
 }
 
 type Ledger struct {
