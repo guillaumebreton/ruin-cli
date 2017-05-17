@@ -47,7 +47,7 @@ var modifyTransactionCmd = &cobra.Command{
 						tx.UserDate = d
 					}
 					ledger.UpdateTransaction(id, tx)
-					fmt.Printf("Transaction %s updated\n", args[0])
+					fmt.Printf("Transaction %d updated\n", id)
 				}
 			}
 		}
