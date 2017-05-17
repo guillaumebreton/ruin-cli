@@ -34,11 +34,11 @@ var modifyTransactionCmd = &cobra.Command{
 		for _, v := range arr {
 			id, err := strconv.Atoi(v)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s not found", v)
+				fmt.Fprintf(os.Stderr, "%s not found\n", v)
 			} else {
 				tx, err := ledger.GetTransactionByNumber(id)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "%d not found", id)
+					fmt.Fprintf(os.Stderr, "%d not found\n", id)
 				} else {
 					if modifyCategory != "" {
 						tx.Category = modifyCategory
@@ -47,10 +47,10 @@ var modifyTransactionCmd = &cobra.Command{
 						tx.UserDate = d
 					}
 					ledger.UpdateTransaction(id, tx)
+					fmt.Printf("Transaction %s updated\n", args[0])
 				}
 			}
 		}
-		fmt.Printf("Transaction %s updated\n", args[0])
 		err = ledger.Save(ledgerFile)
 		util.ExitOnError(err, "Fail to save file")
 	},
