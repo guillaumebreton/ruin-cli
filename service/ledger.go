@@ -118,9 +118,10 @@ func (l *Ledger) UpdateTransaction(number int, tx *Transaction) error {
 }
 
 type Filter struct {
-	StartDate time.Time
-	EndDate   time.Time
-	Category  string
+	StartDate  time.Time
+	EndDate    time.Time
+	Category   string
+	NoCategory bool
 }
 
 func NewFilter() *Filter {
@@ -142,7 +143,10 @@ func (f *Filter) IsFiltered(transaction *Transaction) bool {
 		if transaction.Category != f.Category {
 			return true
 		}
+	}
 
+	if f.NoCategory {
+		return transaction.Category != ""
 	}
 	return false
 }
