@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/guillaumebreton/ruin/util"
@@ -32,7 +33,7 @@ var tagCmd = &cobra.Command{
 				goto exitLoop
 				break
 			default:
-				v.Category = input
+				v.Category = strings.TrimSuffix(input, "\n")
 				ledger.UpdateTransaction(v.Number, v)
 				count++
 			}
