@@ -25,5 +25,4 @@ var modifyBudgetCmd = &cobra.Command{
 
 func init() {
 	modifyCmd.AddCommand(modifyBudgetCmd)
-	modifyBudgetCmd.Flags().StringVarP(&modifyCategory, "category", "c", "", "Set the transaction category")
 }
