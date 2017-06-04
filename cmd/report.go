@@ -93,7 +93,7 @@ var reportCmd = &cobra.Command{
 
 func RenderReport(balance float64, report map[string]ReportBudget) {
 	table := table.NewTable()
-	table.SetHeader([]string{"CATEGORY", "CURRENT", "FUTURE", "STATUS"})
+	table.SetHeader([]string{"CATEGORY", "CURRENT", "FUTURE", "LEFT", "OVERSPENT"})
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -103,9 +103,11 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 	sort.Strings(keys)
 
 	var eom float64
+	var overspent_eom float64
 	for _, k := range keys {
 		v := report[k]
-		var sum float64 = 0
+		var sum float64
+		var overspent float64
 		for _, v := range v.Transactions {
 			sum += v.Amount
 		}
@@ -122,14 +124,23 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 			current = sum
 			future = sum
 			left = 0
+
 		}
-		table.Append([]string{v.Category, format(current), format(future), format(left)})
+
+		if future == current && current < 0 {
+			overspent = sum
+		} else if left < 0 {
+			overspent = -1 * left
+		}
+
+		table.Append([]string{v.Category, format(current), format(future), format(left), format(overspent)})
 		if left > 0 {
 			eom += left
 		}
+		overspent_eom += overspent
 	}
 	table.AppendSeparator()
-	table.Append([]string{"BALANCE", format(balance), format(balance - eom), ""})
+	table.Append([]string{"BALANCE", format(balance), format(balance - eom), "", format(overspent_eom)})
 	table.Render(os.Stdout)
 }
 
