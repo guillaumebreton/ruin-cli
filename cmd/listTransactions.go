@@ -35,6 +35,12 @@ var listTransactionsCmd = &cobra.Command{
 		if listCategory != "" {
 			f.Category = listCategory
 		}
+		// reindex if the ledger is dirty
+		if ledger.Dirty {
+			ledger.Reindex()
+			err := ledger.Save(ledgerFile)
+			util.ExitOnError(err, "Fail to save file")
+		}
 		RenderTransactionListText(ledger.GetTransactions(f))
 	},
 }

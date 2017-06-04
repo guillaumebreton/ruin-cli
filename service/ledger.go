@@ -21,6 +21,7 @@ func (a Transactions) Less(i, j int) bool {
 }
 
 type Ledger struct {
+	Dirty        bool               `json:"dirty"`
 	version      int                `json:"version"`
 	Balance      float64            `json:"balance"`
 	Budgets      map[string]float64 `json:"budgets"`
@@ -47,7 +48,7 @@ func (t *Transaction) GetDate() time.Time {
 }
 
 func NewLedger() *Ledger {
-	return &Ledger{1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}
+	return &Ledger{false, 1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}
 }
 
 func LoadLedger(filepath string) (*Ledger, error) {
@@ -64,17 +65,6 @@ func LoadLedger(filepath string) (*Ledger, error) {
 }
 
 func (l *Ledger) Save(filepath string) error {
-	t := Transactions(l.Transactions)
-	sort.Sort(t)
-	previousBalance := l.Balance
-	// reindex
-	for k, v := range t {
-		v.Number = k + 1
-		v.Balance = previousBalance
-		previousBalance = previousBalance - v.Amount
-		t[k] = v
-	}
-	l.Transactions = t
 	j, err := json.Marshal(l)
 	if err != nil {
 		return err
@@ -82,8 +72,25 @@ func (l *Ledger) Save(filepath string) error {
 	return ioutil.WriteFile(filepath, j, 0644)
 }
 
+func (l *Ledger) Reindex() {
+
+	if l.Dirty {
+		t := Transactions(l.Transactions)
+		sort.Sort(t)
+		previousBalance := l.Balance
+		// reindex
+		for k, v := range t {
+			v.Number = k + 1
+			v.Balance = previousBalance
+			previousBalance = previousBalance - v.Amount
+			t[k] = v
+		}
+	}
+}
+
 func (l *Ledger) Add(ID string, date time.Time, txtype string, description string, amount float64) bool {
 	t := l.GetTransactionById(ID)
+	l.Dirty = true
 	if t == nil {
 		transaction := Transaction{
 			ID:          ID,
@@ -107,10 +114,10 @@ func (l *Ledger) Add(ID string, date time.Time, txtype string, description strin
 }
 
 func (l *Ledger) UpdateTransaction(number int, tx *Transaction) error {
-
 	for k, t := range l.Transactions {
 		if t.Number == number {
 			l.Transactions[k] = tx
+			l.Dirty = true
 			return nil
 		}
 	}
@@ -179,6 +186,7 @@ func (l *Ledger) GetTransactions(f *Filter) Transactions {
 }
 
 func (l *Ledger) RenameCategory(oldName, newName string) {
+	l.Dirty = true
 	for k, tx := range l.Transactions {
 		if tx.Category == oldName {
 			tx.Category = newName
@@ -190,6 +198,7 @@ func (l *Ledger) RenameCategory(oldName, newName string) {
 }
 
 func (l *Ledger) DeleteBudget(category string) error {
+	l.Dirty = true
 	delete(l.Budgets, category)
 	return nil
 }
@@ -199,6 +208,7 @@ func (l *Ledger) GetBudgets() Budgets {
 }
 
 func (l *Ledger) SetBudget(category string, value float64) error {
+	l.Dirty = true
 	l.Budgets[category] = value
 	return nil
 }
