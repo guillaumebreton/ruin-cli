@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/guillaumebreton/ruin/ofx"
 	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
@@ -12,7 +13,6 @@ var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "import an ofx file into the ledger",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		o, err := ofx.Parse(args[0])
 		util.ExitOnError(err, "Fail to parse OFX file")
 		count := 0
@@ -24,6 +24,7 @@ var importCmd = &cobra.Command{
 		}
 		ledger.Balance = o.Balance
 		if count > 0 {
+			ledger.Reindex()
 			err = ledger.Save(ledgerFile)
 			util.ExitOnError(err, "Fail to save ledger")
 		}
