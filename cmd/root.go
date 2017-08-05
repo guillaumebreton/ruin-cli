@@ -30,12 +30,20 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initLedger)
-	RootCmd.PersistentFlags().StringVarP(&ledgerFile, "file", "f", "$HOME/.ruin.json", "Ledger file")
+	RootCmd.PersistentFlags().StringVarP(&ledgerFile, "file", "f", "", "Ledger file")
 }
 
 func initLedger() {
 	var err error
+	if ledgerFile == "" {
+		// try to set it with the current directory
+		ledgerFile = "ruin.json"
+		if _, err := os.Stat(ledgerFile); os.IsNotExist(err) {
+			ledgerFile = "$HOME/.ruin.json"
+		}
+	}
 	ledger, err = service.LoadLedger(ledgerFile)
+
 	if err != nil {
 		if ledgerFile == "$HOME/.ruin.json" {
 			ledger = service.NewLedger()
