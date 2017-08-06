@@ -78,6 +78,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/jinzhu/now",
+			"repository": "https://github.com/jinzhu/now",
+			"vcs": "git",
+			"revision": "d939ba741945c047cac69c329c5fb0d6b4a06520",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/kr/fs",
 			"repository": "https://github.com/kr/fs",
 			"vcs": "git",

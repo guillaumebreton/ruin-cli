@@ -2,19 +2,21 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/guillaumebreton/ruin/service"
-	"github.com/guillaumebreton/ruin/table"
-	"github.com/guillaumebreton/ruin/util"
-	"github.com/spf13/cobra"
 	"math"
 	"os"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/guillaumebreton/ruin/service"
+	"github.com/guillaumebreton/ruin/table"
+	"github.com/guillaumebreton/ruin/util"
+	"github.com/jinzhu/now"
+	"github.com/spf13/cobra"
 )
 
-var reportEndDate string
-var reportStartDate string
+var monthlyReportMonth string
+var monthlyReportYear string
 var reportWithTransactions bool
 
 type ReportBudget struct {
@@ -23,23 +25,27 @@ type ReportBudget struct {
 	Transactions service.Transactions
 }
 
-// reportCmd represents the report command
-var reportCmd = &cobra.Command{
-	Use:   "report",
-	Short: "Show reporting with budget difference",
+// monthlyCmd represents the monthly command
+var monthlyCmd = &cobra.Command{
+	Use:   "monthly",
+	Short: "Generate a monthly report",
 	Run: func(cmd *cobra.Command, args []string) {
-
+		if monthlyReportMonth == "" {
+			monthlyReportMonth = time.Now().Format("Jan")
+		}
+		if monthlyReportYear == "" {
+			monthlyReportYear = time.Now().Format("2006")
+		}
+		t, err := time.Parse("Jan 2006", fmt.Sprintf("%s %s", monthlyReportMonth, monthlyReportYear))
+		if err != nil {
+			util.ExitOnError(err, "Invalid date format")
+		}
+		som := now.New(t).BeginningOfMonth()
+		eom := now.New(t).EndOfMonth()
 		f := service.NewFilter()
-		if reportEndDate != "" {
-			t, err := time.Parse("2006-01-02", reportEndDate)
-			util.ExitOnError(err, "Invalid end-date format")
-			f.EndDate = t
-		}
-		if reportStartDate != "" {
-			t, err := time.Parse("2006-01-02", reportStartDate)
-			util.ExitOnError(err, "Invalid start-date format")
-			f.StartDate = t
-		}
+		f.StartDate = som
+		f.EndDate = eom
+
 		txs := ledger.GetTransactions(f)
 
 		// Get budgets
@@ -185,9 +191,9 @@ func RenderReportWithTransactions(report map[string]ReportBudget) {
 }
 
 func init() {
-	RootCmd.AddCommand(reportCmd)
-	reportCmd.Flags().StringVarP(&reportStartDate, "start-date", "s", "", "the start date")
-	reportCmd.Flags().StringVarP(&reportEndDate, "end-date", "e", "", "the end date")
-	reportCmd.Flags().BoolVarP(&reportWithTransactions, "with-transactions", "t", false, "report budget with associated transactions")
+	RootCmd.AddCommand(monthlyCmd)
+	monthlyCmd.Flags().StringVarP(&monthlyReportMonth, "month", "m", "", "the report month (default to the current month)")
+	monthlyCmd.Flags().StringVarP(&monthlyReportYear, "year", "y", "", "the report year (default to the current year)")
+	monthlyCmd.Flags().BoolVarP(&reportWithTransactions, "with-transactions", "t", false, "report budget with associated transactions")
 
 }
