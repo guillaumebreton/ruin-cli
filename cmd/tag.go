@@ -14,7 +14,7 @@ import (
 // tagCmd represents the tag command
 var tagCmd = &cobra.Command{
 	Use:   "tag",
-	Short: "Tag a transaction",
+	Short: "Interactive command to tag process",
 	Run: func(cmd *cobra.Command, args []string) {
 		// loop
 		count := 0
