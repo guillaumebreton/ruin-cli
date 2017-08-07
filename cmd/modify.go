@@ -7,7 +7,7 @@ import (
 // modifyCmd represents the modify command
 var modifyCmd = &cobra.Command{
 	Use:   "modify",
-	Short: "Modify a budget, a transaction or a category",
+	Short: "Modify a budget, a category",
 }
 
 func init() {
