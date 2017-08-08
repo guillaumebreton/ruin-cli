@@ -27,6 +27,7 @@ type Ledger struct {
 	Dirty        bool               `json:"dirty"`
 	version      int                `json:"version"`
 	Balance      float64            `json:"balance"`
+	BalanceDate  time.Time          `json:"balance-date"`
 	Budgets      map[string]float64 `json:"budgets"`
 	Transactions Transactions       `json:"transactions"`
 }
@@ -51,7 +52,7 @@ func (t *Transaction) GetDate() time.Time {
 }
 
 func NewLedger() *Ledger {
-	return &Ledger{false, 1, 0, make(map[string]float64, 0), make([]*Transaction, 0)}
+	return &Ledger{false, 1, 0, time.Now(), make(map[string]float64, 0), make([]*Transaction, 0)}
 }
 
 func LoadLedger(filepath string) (*Ledger, error) {

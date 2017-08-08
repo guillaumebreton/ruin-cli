@@ -14,7 +14,16 @@ import (
 type OFX struct {
 	XMLName      xml.Name      `xml:"OFX"`
 	Balance      float64       `xml:"BANKMSGSRSV1>STMTTRNRS>STMTRS>AVAILBAL>BALAMT"`
+	Date         string        `xml:"BANKMSGSRSV1>STMTTRNRS>STMTRS>AVAILBAL>DTAOF"`
 	Transactions []Transaction `xml:"BANKMSGSRSV1>STMTTRNRS>STMTRS>BANKTRANLIST>STMTTRN"`
+}
+
+func (o *OFX) GetBalanceDate() time.Time {
+	v, err := time.Parse("20060102", o.Date)
+	if err != nil {
+		return time.Time{}
+	}
+	return v
 }
 
 type Transaction struct {
