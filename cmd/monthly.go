@@ -108,7 +108,7 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 	}
 	sort.Strings(keys)
 
-	var eom, overspentEom, sumBudgeted float64
+	var eom, overspentEom, sumBudgeted, totalLeft float64
 	for _, k := range keys {
 		v := report[k]
 		var sum float64
@@ -138,6 +138,7 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 			overspent = -1 * left
 		}
 		sumBudgeted += v.Value
+		totalLeft += left
 
 		table.Append([]string{v.Category, format(current), format(v.Value), format(left), format(overspent), format(future)})
 		if left > 0 {
@@ -146,7 +147,7 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 		overspentEom += -1 * overspent
 	}
 	table.AppendSeparator()
-	table.Append([]string{"BALANCE", format(balance), format(sumBudgeted), "", format(overspentEom), format(balance - eom)})
+	table.Append([]string{"BALANCE", format(balance), format(sumBudgeted), format(totalLeft), format(overspentEom), format(balance - eom)})
 	table.Render(os.Stdout)
 }
 

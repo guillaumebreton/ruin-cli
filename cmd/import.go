@@ -48,7 +48,7 @@ var importCmd = &cobra.Command{
 
 			}
 		}
-		if total > 0 {
+		if ledger.Dirty {
 			ledger.Reindex()
 			err := ledger.Save(ledgerFile)
 			util.ExitOnError(err, "Fail to save ledger")
@@ -69,6 +69,12 @@ func importFile(file string) (int, error) {
 	}
 	if o.GetBalanceDate().After(ledger.BalanceDate) {
 		ledger.Balance = o.Balance
+		ledger.BalanceDate = o.GetBalanceDate()
+		ledger.Dirty = true
+	}
+
+	if count > 0 {
+		ledger.Dirty = true
 	}
 
 	return count, nil
