@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"strconv"
+
 	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 // setBudgetCmd represents the set command
@@ -16,10 +17,17 @@ var modifyBudgetCmd = &cobra.Command{
 		}
 		key := args[0]
 		value := args[1]
-		v, _ := strconv.ParseFloat(value, 64)
-		ledger.SetBudget(key, v)
-		err := ledger.Save(ledgerFile)
-		util.ExitOnError(err, "Fail to save ledger file")
+		v, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			util.ExitOnError(err, "Fail to pase the value")
+		}
+		if v <= 0 {
+			ledger.DeleteBudget(key)
+		} else {
+			ledger.SetBudget(key, v)
+			err := ledger.Save(ledgerFile)
+			util.ExitOnError(err, "Fail to save ledger file")
+		}
 	},
 }
 
