@@ -121,7 +121,7 @@ func RenderShowTransaction(tx *service.Transaction) {
 }
 func RenderTransactionListText(transactions []*service.Transaction) {
 	table := table.NewTable()
-	table.SetHeader([]string{"#", "DATE", "DESCRIPTION", "CATEGORY", "AMOUNT"})
+	table.SetHeader("#", "DATE", "DESCRIPTION", "CATEGORY", "AMOUNT")
 	for _, v := range transactions {
 		table.Append([]string{fmt.Sprintf("%d", v.Number), v.GetDate().Format("2006-01-02"), v.Description, v.Category, fmt.Sprintf("%.2f", v.Amount)})
 	}

@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/guillaumebreton/ruin/table"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // listBCmd represents the list command
@@ -25,13 +25,13 @@ func init() {
 
 func RenderBudgetsListText(budgets service.Budgets) {
 	table := table.NewTable()
-	table.SetHeader([]string{"CATEGORY", "VALUE"})
+	table.SetHeader("CATEGORY", "VALUE")
 	var sum float64
 	for k, v := range budgets {
 		sum += v
-		table.Append([]string{k, fmt.Sprintf("%.2f", v)})
+		table.Append(k, v)
 	}
 	table.AppendSeparator()
-	table.Append([]string{"TOTAL", fmt.Sprintf("%0.2f", sum)})
+	table.Append("TOTAL", sum)
 	table.Render(os.Stdout)
 }

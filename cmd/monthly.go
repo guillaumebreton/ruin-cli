@@ -98,8 +98,10 @@ var monthlyCmd = &cobra.Command{
 }
 
 func RenderReport(balance float64, report map[string]ReportBudget) {
-	table := table.NewTable()
-	table.SetHeader([]string{"CATEGORY", "CURRENT", "BUDGETED", "LEFT", "OVERSPENT", "FUTURE"})
+	t := table.NewTable()
+	t.Renderer[4] = table.PositiveRed
+	t.Renderer[3] = table.RedGreen
+	t.SetHeader("CATEGORY", "CURRENT", "BUDGETED", "LEFT", "OVERSPENT", "FUTURE")
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -140,15 +142,15 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 		sumBudgeted += v.Value
 		totalLeft += left
 
-		table.Append([]string{v.Category, format(current), format(v.Value), format(left), format(overspent), format(future)})
+		t.Append(v.Category, current, v.Value, left, overspent, future)
 		if left > 0 {
 			eom += left
 		}
-		overspentEom += -1 * overspent
+		overspentEom += overspent
 	}
-	table.AppendSeparator()
-	table.Append([]string{"BALANCE", format(balance), format(sumBudgeted), format(totalLeft), format(overspentEom), format(balance - eom)})
-	table.Render(os.Stdout)
+	t.AppendSeparator()
+	t.Append("BALANCE", balance, sumBudgeted, totalLeft, overspentEom, balance-eom)
+	t.Render(os.Stdout)
 }
 
 func format(v float64) string {
@@ -157,7 +159,7 @@ func format(v float64) string {
 
 func RenderReportWithTransactions(report map[string]ReportBudget) {
 	table := table.NewTable()
-	table.SetHeader([]string{"#", "CATEGORY", "SPENT"})
+	table.SetHeader("#", "CATEGORY", "SPENT")
 
 	// the keys
 	keys := make([]string, 0, len(report))
@@ -181,7 +183,7 @@ func RenderReportWithTransactions(report map[string]ReportBudget) {
 			table.Append([]string{"", strings.ToUpper(v.Category), ""})
 			table.AppendSeparator()
 			for _, t := range v.Transactions {
-				table.Append([]string{fmt.Sprintf("%d", t.Number), t.Description, fmt.Sprintf("%0.2f", t.Amount)})
+				table.Append(fmt.Sprintf("%d", t.Number), t.Description, fmt.Sprintf("%0.2f", t.Amount))
 			}
 			table.AppendSeparator()
 			table.Append([]string{"", "TOTAL", fmt.Sprintf("%0.2f", sum)})

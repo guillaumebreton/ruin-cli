@@ -61,7 +61,7 @@ func renderYearlyReport(month int, data map[string][]float64) {
 	for i := 1; i <= month; i++ {
 		header[i] = strings.ToUpper(fmt.Sprintf("%s", time.Month(i)))
 	}
-	table.SetHeader(header)
+	table.SetHeader(header...)
 
 	//the last row
 	total := make([]float64, month+1)
@@ -75,21 +75,21 @@ func renderYearlyReport(month int, data map[string][]float64) {
 
 	for _, k := range keys {
 		vs := data[k]
-		row := make([]string, 2+month)
+		row := make([]interface{}, 2+month)
 		row[0] = k
 		for i, v := range vs {
-			row[i+1] = fmt.Sprintf("%0.2f", v)
+			row[i+1] = v
 			total[i] = total[i] + v
 		}
-		table.Append(row)
+		table.Append(row...)
 	}
-	totalRow := make([]string, 2+month)
+	totalRow := make([]interface{}, 2+month)
 	totalRow[0] = "TOTAL"
 	for k, v := range total {
-		totalRow[k+1] = fmt.Sprintf("%0.2f", v)
+		totalRow[k+1] = v
 	}
 	table.AppendSeparator()
-	table.Append(totalRow)
+	table.Append(totalRow...)
 	table.Render(os.Stdout)
 
 }
