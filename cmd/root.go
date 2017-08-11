@@ -5,12 +5,14 @@ import (
 	"os"
 	"os/user"
 
+	"github.com/fatih/color"
 	"github.com/guillaumebreton/ruin/service"
 	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 )
 
 var ledgerFile string
+var noColor bool
 var ledger *service.Ledger
 
 // RootCmd represents the base command when called without any subcommands
@@ -29,11 +31,14 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initLedger)
+	cobra.OnInitialize(initApp)
 	RootCmd.PersistentFlags().StringVarP(&ledgerFile, "file", "f", "", "Ledger file")
+	RootCmd.PersistentFlags().BoolVarP(&noColor, "no-color", "n", false, "Disable color in reports")
 }
 
-func initLedger() {
+func initApp() {
+	color.NoColor = noColor
+
 	var err error
 	if ledgerFile == "" {
 		// try to set it with the current directory
