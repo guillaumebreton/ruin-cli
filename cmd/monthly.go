@@ -180,13 +180,13 @@ func RenderReportWithTransactions(report map[string]ReportBudget) {
 			reservedTotal += -1 * v.Value
 			leftTotal += v.Value - math.Abs(sum)
 			table.AppendSeparator()
-			table.Append([]string{"", strings.ToUpper(v.Category), ""})
+			table.Append("", strings.ToUpper(v.Category), "")
 			table.AppendSeparator()
 			for _, t := range v.Transactions {
 				table.Append(fmt.Sprintf("%d", t.Number), t.Description, fmt.Sprintf("%0.2f", t.Amount))
 			}
 			table.AppendSeparator()
-			table.Append([]string{"", "TOTAL", fmt.Sprintf("%0.2f", sum)})
+			table.Append("", "TOTAL", fmt.Sprintf("%0.2f", sum))
 		}
 	}
 
