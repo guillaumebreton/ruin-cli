@@ -23,14 +23,22 @@ var budgetsCmd = &cobra.Command{
 			budgets := ledger.GetBudgets()
 			RenderBudgetsListText(budgets)
 		} else {
+			if !budgetDelete && budgetValue == "" {
+				util.Exit("Please use -v with a value or -d")
+			}
 			for _, budget := range args {
-				println(budget, budgetValue)
 				if budgetDelete {
 					ledger.DeleteBudget(budget)
 				} else {
-					v, err := strconv.ParseFloat(budgetValue, 64)
+					var v float64
+					var err error
+					if budgetValue == "" {
+						v = 0
+					} else {
+						v, err = strconv.ParseFloat(budgetValue, 64)
+					}
 					if err != nil {
-						util.ExitOnError(err, "Fail to pase the value")
+						util.ExitOnError(err, "Fail to parese the value")
 					}
 					err = ledger.SetBudget(budget, v)
 					if err != nil {
