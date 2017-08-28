@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/guillaumebreton/ruin/service"
@@ -15,7 +14,7 @@ import (
 
 // ruin tx
 // ruin tx 24 -c test
-// ruin tx 24,25 -c test -d 12
+// ruin tx 24 25 -c test -d 12
 
 var (
 	txCategory  string
@@ -59,11 +58,9 @@ var txCmd = &cobra.Command{
 			RenderTransactionListText(ledger.GetTransactions(f))
 		} else {
 
-			arr := strings.Split(args[0], ",")
-
 			var err error
 			if txDate == "" && txCategory == "" {
-				for _, v := range arr {
+				for _, v := range args {
 					id, err := strconv.Atoi(v)
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "%s not found\n", v)
@@ -80,7 +77,7 @@ var txCmd = &cobra.Command{
 					d, err = time.Parse(service.ShortFormat, txDate)
 					util.ExitOnError(err, "Invalid date")
 				}
-				for _, v := range arr {
+				for _, v := range args {
 					id, err := strconv.Atoi(v)
 					if err != nil {
 						fmt.Fprintf(os.Stderr, "%s not found\n", v)
