@@ -8,6 +8,7 @@ import (
 )
 
 var red = color.New(color.FgRed).SprintFunc()
+var Yellow = color.New(color.FgYellow).SprintFunc()
 
 func PositiveRed(v float64) string {
 	if v > 0 {

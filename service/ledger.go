@@ -217,7 +217,7 @@ func (l *Ledger) SetBudget(category string, value float64) error {
 	return nil
 }
 
-func (l *Ledger) Autotag() int {
+func (l *Ledger) Autotag() []*Transaction {
 	count := 0
 	f := NewFilter()
 	txs := l.GetTransactions(f)
@@ -245,6 +245,7 @@ func (l *Ledger) Autotag() int {
 	}
 
 	// look for similarities
+	tagged := []*Transaction{}
 	for _, noCatTx := range nonCatTxs {
 		var tags map[string]int
 		var previousLength = 99999
@@ -259,11 +260,12 @@ func (l *Ledger) Autotag() int {
 			if noCatTx.Category = max(tags); noCatTx.Category != "" {
 				count++
 				l.UpdateTransaction(noCatTx.Number, noCatTx)
+				tagged = append(tagged, noCatTx)
 			}
 		}
 	}
 
-	return count
+	return tagged
 }
 
 func max(categories map[string]int) string {

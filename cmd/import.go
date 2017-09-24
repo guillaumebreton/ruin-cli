@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/guillaumebreton/ruin/ofx"
+	"github.com/guillaumebreton/ruin/service"
 	"github.com/guillaumebreton/ruin/util"
 	"github.com/spf13/cobra"
 )
@@ -45,13 +46,17 @@ var importCmd = &cobra.Command{
 				count, err := importFile(arg)
 				util.ExitOnError(err, fmt.Sprintf("Fail to read dir %s", arg))
 				total += count
-
 			}
 		}
+		var tagged []*service.Transaction
 		if ledger.Dirty {
 			ledger.Reindex()
+			tagged = ledger.Autotag()
 			err := ledger.Save(ledgerFile)
 			util.ExitOnError(err, "Fail to save ledger")
+		}
+		for _, v := range tagged {
+			fmt.Printf("Transaction %s - %s was tagged %s", v.ID, v.Description, util.Yellow("%s", v.Category))
 		}
 		fmt.Printf("%d transaction(s) added\n", total)
 	},
