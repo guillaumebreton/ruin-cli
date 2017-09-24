@@ -24,12 +24,18 @@ func (a Transactions) Less(i, j int) bool {
 }
 
 type Ledger struct {
-	Dirty        bool               `json:"dirty"`
-	version      int                `json:"version"`
-	Balance      float64            `json:"balance"`
-	BalanceDate  time.Time          `json:"balance-date"`
-	Budgets      map[string]float64 `json:"budgets"`
-	Transactions Transactions       `json:"transactions"`
+	Dirty        bool              `json:"dirty"`
+	version      int               `json:"version"`
+	Balance      float64           `json:"balance"`
+	BalanceDate  time.Time         `json:"balance-date"`
+	Budgets      map[string]Budget `json:"budgets"`
+	Transactions Transactions      `json:"transactions"`
+}
+
+type Budget map[string]float64
+
+func NewBudget() Budget {
+	return make(map[string]float64, 0)
 }
 
 type Transaction struct {
@@ -52,7 +58,7 @@ func (t *Transaction) GetDate() time.Time {
 }
 
 func NewLedger() *Ledger {
-	return &Ledger{false, 1, 0, time.Now(), make(map[string]float64, 0), make([]*Transaction, 0)}
+	return &Ledger{false, 1, 0, time.Now(), make(map[string]Budget, 0), make([]*Transaction, 0)}
 }
 
 func LoadLedger(filepath string) (*Ledger, error) {
@@ -187,30 +193,43 @@ func (l *Ledger) GetTransactions(f *Filter) Transactions {
 	return result
 }
 
-func (l *Ledger) RenameCategory(oldName, newName string) {
-	l.Dirty = true
-	for k, tx := range l.Transactions {
-		if tx.Category == oldName {
-			tx.Category = newName
-			l.Transactions[k] = tx
-		}
+// func (l *Ledger) RenameCategory(oldName, newName string) {
+// 	l.Dirty = true
+// 	for k, tx := range l.Transactions {
+// 		if tx.Category == oldName {
+// 			tx.Category = newName
+// 			l.Transactions[k] = tx
+// 		}
+// 	}
+// 	l.Budgets[newName] = l.Budgets[oldName]
+// 	delete(l.Budgets, oldName)
+// }
+
+// func (l *Ledger) DeleteBudget(category string) error {
+// 	l.Dirty = true
+// 	delete(l.Budgets, category)
+// 	return nil
+// }
+
+// func (l *Ledger) GetBudgets() Budgets {
+// 	return l.Budgets
+// }
+
+// func (l *Ledger) SetBudget(category string, value float64) error {
+// 	l.Dirty = true
+// 	l.Budgets[category] = value
+// 	return nil
+// }
+
+// GetBudget
+func (l *Ledger) GetBudget(period string) Budget {
+	b, ok := l.Budgets[period]
+	if !ok {
+		return NewBudget()
 	}
-	l.Budgets[newName] = l.Budgets[oldName]
-	delete(l.Budgets, oldName)
+	return b
 }
 
-func (l *Ledger) DeleteBudget(category string) error {
-	l.Dirty = true
-	delete(l.Budgets, category)
-	return nil
-}
-
-func (l *Ledger) GetBudgets() Budgets {
-	return l.Budgets
-}
-
-func (l *Ledger) SetBudget(category string, value float64) error {
-	l.Dirty = true
-	l.Budgets[category] = value
-	return nil
+func (l *Ledger) UpdateBudget(period string, budget Budget) {
+	l.Budgets[period] = budget
 }

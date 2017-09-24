@@ -49,7 +49,7 @@ var monthlyCmd = &cobra.Command{
 		txs := ledger.GetTransactions(f)
 
 		// Get budgets
-		budgets := ledger.GetBudgets()
+		budgets := ledger.GetBudget(t.Format("1-2006"))
 
 		report := map[string]ReportBudget{}
 
