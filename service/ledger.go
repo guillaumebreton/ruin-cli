@@ -7,6 +7,8 @@ import (
 	"os"
 	"sort"
 	"time"
+
+	"github.com/m1ome/leven"
 )
 
 var ShortFormat = "2006-01-02"
@@ -213,4 +215,73 @@ func (l *Ledger) SetBudget(category string, value float64) error {
 	l.Dirty = true
 	l.Budgets[category] = value
 	return nil
+}
+
+func (l *Ledger) Autotag() int {
+	count := 0
+	f := NewFilter()
+	txs := l.GetTransactions(f)
+
+	nonCatTxs := []*Transaction{}
+	catTxs := map[string]map[string]int{}
+	// map a description with the tag + count
+	for _, tx := range txs {
+		if tx.Category != "" {
+			v, ok := catTxs[tx.Description]
+			if !ok {
+				v = map[string]int{}
+			}
+			c, ok := v[tx.Category]
+			if !ok {
+				v[tx.Category] = 1
+			} else {
+				v[tx.Category] = c + 1
+			}
+			catTxs[tx.Description] = v
+
+		} else {
+			nonCatTxs = append(nonCatTxs, tx)
+		}
+	}
+
+	// look for similarities
+	for _, noCatTx := range nonCatTxs {
+		var tags map[string]int
+		var previousLength = 99999
+		for k, v := range catTxs {
+			l := leven.Distance(noCatTx.Description, k)
+			if l < previousLength && l < 10 {
+				tags = v
+				previousLength = l
+			}
+		}
+		if len(tags) != 0 {
+			if noCatTx.Category = max(tags); noCatTx.Category != "" {
+				count++
+				l.UpdateTransaction(noCatTx.Number, noCatTx)
+			}
+		}
+	}
+
+	return count
+}
+
+func max(categories map[string]int) string {
+	total := 0
+	for _, count := range categories {
+		total += count
+	}
+	catToApply := ""
+	var score float32 = 0
+	for cat, count := range categories {
+		percentage := (float32(count) / float32(total)) * 100
+		if percentage > score {
+			score = percentage
+			catToApply = cat
+		}
+	}
+	if score > 33 && catToApply != "" && total != 2 {
+		return catToApply
+	}
+	return ""
 }
