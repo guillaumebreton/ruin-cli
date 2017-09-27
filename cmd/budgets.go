@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -28,7 +29,9 @@ var budgetsCmd = &cobra.Command{
 			}
 			for _, budget := range args {
 				if budgetDelete {
-					ledger.DeleteBudget(budget)
+					err := ledger.DeleteBudget(budget)
+					util.ExitOnError(err, "Fail to delete budget")
+					fmt.Println("Budget deleted")
 				} else {
 					var v float64
 					var err error
