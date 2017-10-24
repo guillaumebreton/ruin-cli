@@ -27,7 +27,7 @@ func (a Transactions) Less(i, j int) bool {
 
 type Ledger struct {
 	Dirty        bool               `json:"dirty"`
-	version      int                `json:"version"`
+	Version      int                `json:"version"`
 	Balance      float64            `json:"balance"`
 	BalanceDate  time.Time          `json:"balance-date"`
 	Budgets      map[string]float64 `json:"budgets"`
@@ -43,6 +43,7 @@ type Transaction struct {
 	UserDate    time.Time `json:"user-date"`
 	Type        string    `json:"type"`
 	Category    string    `json:"category"`
+	Autotagged  bool      `json:"autotagged"`
 	Balance     float64   `json:"balance"`
 }
 
@@ -238,14 +239,14 @@ func (l *Ledger) Autotag() []*Transaction {
 				v[tx.Category] = c + 1
 			}
 			catTxs[tx.Description] = v
-
 		} else {
-			nonCatTxs = append(nonCatTxs, tx)
+			if !tx.Autotagged {
+				nonCatTxs = append(nonCatTxs, tx)
+			}
 		}
 	}
 
 	// look for similarities
-	tagged := []*Transaction{}
 	for _, noCatTx := range nonCatTxs {
 		var tags map[string]int
 		var previousLength = 99999
@@ -260,12 +261,11 @@ func (l *Ledger) Autotag() []*Transaction {
 			if noCatTx.Category = max(tags); noCatTx.Category != "" {
 				count++
 				l.UpdateTransaction(noCatTx.Number, noCatTx)
-				tagged = append(tagged, noCatTx)
 			}
 		}
+		noCatTx.Autotagged = true
 	}
-
-	return tagged
+	return nonCatTxs
 }
 
 func max(categories map[string]int) string {

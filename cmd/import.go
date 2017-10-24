@@ -56,7 +56,11 @@ var importCmd = &cobra.Command{
 			util.ExitOnError(err, "Fail to save ledger")
 		}
 		for _, v := range tagged {
-			fmt.Printf("Transaction %d - %s (%.02f) was tagged %s\n", v.Number, v.Description, v.Amount, v.Category)
+			if v.Category == "" {
+				fmt.Printf("Transaction %d - %s (%.02f) was not tagged \n", v.Number, v.Description, v.Amount)
+			} else {
+				fmt.Printf("Transaction %d - %s (%.02f) was tagged %s\n", v.Number, v.Description, v.Amount, v.Category)
+			}
 		}
 		fmt.Printf("%d transaction(s) added\n", total)
 	},
