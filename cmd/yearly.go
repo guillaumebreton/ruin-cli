@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guillaumebreton/ruin/service"
-	"github.com/guillaumebreton/ruin/table"
-	"github.com/guillaumebreton/ruin/util"
+	"github.com/guillaumebreton/ruin-cli/service"
+	"github.com/guillaumebreton/ruin-cli/table"
+	"github.com/guillaumebreton/ruin-cli/util"
 	"github.com/jinzhu/now"
 	"github.com/spf13/cobra"
 )

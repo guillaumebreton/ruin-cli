@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/guillaumebreton/ruin/cmd"
+import "github.com/guillaumebreton/ruin-cli/cmd"
 
 func main() {
 	cmd.Execute()

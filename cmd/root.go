@@ -6,8 +6,8 @@ import (
 	"os/user"
 
 	"github.com/fatih/color"
-	"github.com/guillaumebreton/ruin/service"
-	"github.com/guillaumebreton/ruin/util"
+	"github.com/guillaumebreton/ruin-cli/service"
+	"github.com/guillaumebreton/ruin-cli/util"
 	"github.com/spf13/cobra"
 )
 

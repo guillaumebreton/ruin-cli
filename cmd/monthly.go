@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guillaumebreton/ruin/service"
-	"github.com/guillaumebreton/ruin/table"
-	"github.com/guillaumebreton/ruin/util"
+	"github.com/guillaumebreton/ruin-cli/service"
+	"github.com/guillaumebreton/ruin-cli/table"
+	"github.com/guillaumebreton/ruin-cli/util"
 	"github.com/jinzhu/now"
 	"github.com/spf13/cobra"
 )
@@ -110,46 +110,57 @@ func RenderReport(balance float64, report map[string]ReportBudget) {
 	}
 	sort.Strings(keys)
 
-	var eom, overspentEom, sumBudgeted, totalLeft float64
+	var eom, overspentEom, sumBudgeted, totalLeft, eomFuture float64
 	for _, k := range keys {
-		v := report[k]
-		var sum float64
-		var overspent float64
-		for _, v := range v.Transactions {
-			sum += v.Amount
+		budget := report[k]
+		var current, future, left, overspent float64
+		for _, v := range budget.Transactions {
+			current += v.Amount
 		}
-		var current, future, left float64
-		if v.Value != 0 && (-1*v.Value) < sum {
-			current = sum
-			future = -1 * v.Value
-			left = math.Abs(v.Value) - math.Abs(current)
-		} else if v.Value != 0 && (-1*v.Value) > sum {
-			current = sum
-			future = sum
-			left = math.Abs(v.Value) - math.Abs(current)
+
+		if budget.Value != 0 {
+			if current > 0 {
+				left = budget.Value + current
+				future = current
+			} else if current <= 0 {
+				left = budget.Value + current
+				future = -1 * math.Max(-1*current, budget.Value)
+			}
+
 		} else {
-			current = sum
-			future = sum
+			future = current
 			left = 0
-
 		}
 
-		if v.Value == 0 && current < 0 {
-			overspent = -1 * sum
-		} else if v.Value != 0 && left < 0 {
+		// if budget.Value != 0 && current > (-1*budget.Value) {
+		// 	future = budget.Value
+		// 	left = budget.Value - (-1 * current)
+		// } else if budget.Value != 0 && current < (-1*budget.Value) {
+		// 	future = current - current
+		// 	left = budget.Value - (-1 * current)
+		// } else {
+		// 	future = current
+		// 	left = 0
+
+		// }
+
+		if budget.Value == 0 && current < 0 {
+			overspent = -1 * current
+		} else if budget.Value != 0 && left < 0 {
 			overspent = -1 * left
 		}
-		sumBudgeted += v.Value
+		sumBudgeted += budget.Value
+		eomFuture += future
 		totalLeft += left
 
-		t.Append(v.Category, current, v.Value, left, overspent, future)
+		t.Append(budget.Category, current, budget.Value, left, overspent, future)
 		if left > 0 {
 			eom += left
 		}
 		overspentEom += overspent
 	}
 	t.AppendSeparator()
-	t.Append("BALANCE", balance, sumBudgeted, totalLeft, overspentEom, balance-eom)
+	t.Append("BALANCE", balance, sumBudgeted, totalLeft, overspentEom, eomFuture)
 	t.Render(os.Stdout)
 }
 
