@@ -36,7 +36,7 @@ var importCmd = &cobra.Command{
 				}
 				for _, f := range files {
 					if strings.HasSuffix(f.Name(), ".ofx") {
-						path := path.Join(path.Dir(arg), f.Name())
+						path := path.Join(arg, f.Name())
 						count, err := importFile(path)
 						util.ExitOnError(err, fmt.Sprintf("Fail to read dir %s", arg))
 						total += count
